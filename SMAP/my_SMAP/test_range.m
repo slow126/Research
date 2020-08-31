@@ -1,7 +1,15 @@
-PATH = '/Users/low/CLionProjects/SMAP/sir/setup_files/SMhb*.setup';
+if ismac
+    PATH = '/Users/low/CLionProjects/SMAP/sir/setup_files/SMhb*.setup';
+elseif isunix
+    PATH = '/media/spencer/Scratch_Disk/SMAP/sir/setup_files/SMhb*.setup';
+end
 directory = dir(PATH);
 
-prefix = '/Users/low/CLionProjects/SMAP/sir/setup_files/';
+if ismac
+    prefix = '/Users/low/CLionProjects/SMAP/sir/setup_files/';
+elseif isunix
+    prefix = '/media/spencer/Scratch_Disk/SMAP/sir/setup_files/';
+end
 
 for i=1:length(directory)
     file = strcat(prefix, directory(i).name);

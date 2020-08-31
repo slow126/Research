@@ -14,7 +14,12 @@ tbopt=2; % 1 = NSIDC Tb, 2 = rSIR Tb
 %% Soil Moisture loading
 
 if(res==1)
-    sirfolder=['smData/' num2str(year) '/' num2str(day) '/ancillarysir/'];
+    if ismac
+        sirfolder=['smData/' num2str(year) '/' num2str(day) '/ancillarysir/'];
+    elseif isunix
+        sirfolder=['/media/spencer/Scratch_Disk/MATLAB/SMAP/soil_moisture_matlab/smData/' num2str(year) '/' num2str(day) 'ancillarysir'];
+    end
+    
     if(tbopt==1)
         [tbav, head, descrip, iaopt]=loadsir([sirfolder 'tb_3km-' num2str(day) '.sir']);
         [incav, head, descrip, iaopt]=loadsir([sirfolder 'inc_3km-' num2str(day) '.sir']);
