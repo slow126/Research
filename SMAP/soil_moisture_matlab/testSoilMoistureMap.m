@@ -4,7 +4,7 @@
 
 clear;
 year=2016; %Data only downloaded from 2016
-days=276:276; %Any day or range of days. Data downloaded currently from 1:31, 92:121, 183:213, 275:305 
+days=276:283; %Any day or range of days. Data downloaded currently from 1:31, 92:121, 183:213, 275:305 
 res=1; % 1=3km Sentinel/SMAP ancillary, 2=9km SMAP ancillary, 3=36km SMAP ancillary
 mapplot=0;      % Plot the resultant soil moisture plots
 ancilplot=0;    % Plot some of the ancillary data

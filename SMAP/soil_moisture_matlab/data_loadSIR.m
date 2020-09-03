@@ -16,8 +16,10 @@ tbopt=2; % 1 = NSIDC Tb, 2 = rSIR Tb
 if(res==1)
     if ismac
         sirfolder=['smData/' num2str(year) '/' num2str(day) '/ancillarysir/'];
+        smData_dir = 'smData/';
     elseif isunix
-        sirfolder=['/media/spencer/Scratch_Disk/MATLAB/SMAP/soil_moisture_matlab/smData/' num2str(year) '/' num2str(day) 'ancillarysir'];
+        sirfolder=['/media/spencer/Scratch_Disk/MATLAB/SMAP/soil_moisture_matlab/smData/' num2str(year) '/' num2str(day) '/ancillarysir/'];
+        smData_dir = '/media/spencer/Scratch_Disk/MATLAB/SMAP/soil_moisture_matlab/smData/';
     end
     
     if(tbopt==1)
@@ -30,7 +32,7 @@ if(res==1)
     
     [albav, head, descrip, iaopt]=loadsir([sirfolder 'alb_3km-' num2str(day) '.sir']);
     [qualav, head, descrip, iaopt]=loadsir([sirfolder 'retqual_3km-' num2str(day) '.sir']);
-    [clayf, head, descrip, iaopt]=loadsir('smData/clayf_3km.sir');
+    [clayf, head, descrip, iaopt]=loadsir(strcat(smData_dir, 'clayf_3km.sir'));
     [vopav, head, descrip, iaopt]=loadsir([sirfolder 'vop_3km-' num2str(day) '.sir']);
     [rghav, head, descrip, iaopt]=loadsir([sirfolder 'rgh_3km-' num2str(day) '.sir']);
     [smav, head, descrip, iaopt]=loadsir([sirfolder 'sm_3km-' num2str(day) '.sir']);
@@ -62,7 +64,7 @@ elseif(res==2)
     
     [albav, head, descrip, iaopt]=loadsir([sirfolder 'alb-E2T-' num2str(day) '.sir']);
     [qualav, head, descrip, iaopt]=loadsir([sirfolder 'retqual-E2T-' num2str(day) '.sir']);
-    [clayf, head, descrip, iaopt]=loadsir('smData/clayf.sir');
+    [clayf, head, descrip, iaopt]=loadsir(strcat(smData_dir, 'clayf.sir'));
     [vopav, head, descrip, iaopt]=loadsir([sirfolder 'vop-E2T-' num2str(day) '.sir']);
     [rghav, head, descrip, iaopt]=loadsir([sirfolder 'rgh-E2T-' num2str(day) '.sir']);
     [smav, head, descrip, iaopt]=loadsir([sirfolder 'sm-E2T-' num2str(day) '.sir']);

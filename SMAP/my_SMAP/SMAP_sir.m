@@ -426,12 +426,23 @@ old_amax = a_init;
 a_temp = zeros(nsize,1);
 tot = zeros(nsize,1);
 
-nits = 40;
+nits = 25;
 old_nsx = size(a_val,1);
 old_nsy = size(a_val,2);
 [tbav2, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav]=data_loadSIR(year,day,0,res);
-a_val = 200 .* a_val;
-sm_start_itr = 0;
+tb2_avg = nanmean(nanmean(tbav2));
+a_val =  tb2_avg .* a_val;
+
+% a_val = reshape(a_val, [nsx,nsy]);
+% a_val = flipud(a_val');
+% a_val(isnan(tbav2)) = NaN;
+% 
+% a_val = flipud(a_val);
+% a_val = a_val';
+% 
+% a_val = reshape(a_val, [old_nsx, old_nsy]);
+
+sm_start_itr = 30;
 
 for its = 0:nits - 1
     a_temp = zeros(nsize,1);
@@ -448,6 +459,9 @@ for its = 0:nits - 1
     
     [a_val, a_temp, tot, sx, sx2, total] = get_updates(tbval', ang, count, pointer, aresp1, a_val, sx, sx2, a_temp, tot, nsx, nsy);
     a_val(a_temp > 0) = a_temp(a_temp>0);
+    if its == 0
+        a_val(a_val == tb2_avg * 2) = NaN;
+    end
     my_temp = reshape(a_val, [nsx, nsy]);
     my_temp = flipud(my_temp');
     figure(1)
