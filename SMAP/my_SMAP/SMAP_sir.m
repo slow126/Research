@@ -431,18 +431,11 @@ old_nsx = size(a_val,1);
 old_nsy = size(a_val,2);
 [tbav2, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav]=data_loadSIR(year,day,0,res);
 tb2_avg = nanmean(nanmean(tbav2));
-a_val =  tb2_avg .* a_val;
+a_val = a_val * tb2_avg;
 
-% a_val = reshape(a_val, [nsx,nsy]);
-% a_val = flipud(a_val');
-% a_val(isnan(tbav2)) = NaN;
-% 
-% a_val = flipud(a_val);
-% a_val = a_val';
-% 
-% a_val = reshape(a_val, [old_nsx, old_nsy]);
+[a_val, junk] = compute_ave(tbval',count,pointer,aresp1,a_val, 0);
 
-sm_start_itr = 30;
+sm_start_itr = 5;
 
 for its = 0:nits - 1
     a_temp = zeros(nsize,1);
@@ -464,7 +457,7 @@ for its = 0:nits - 1
     end
     my_temp = reshape(a_val, [nsx, nsy]);
     my_temp = flipud(my_temp');
-    figure(1)
+    figure(its+1)
     imagesc(my_temp)
     colorbar;
     drawnow();
@@ -478,7 +471,7 @@ for its = 0:nits - 1
     
     my_temp = reshape(a_val, [nsx, nsy]);
     my_temp = flipud(my_temp');
-    figure(3)
+    figure(nits+its+i)
     imagesc(my_temp)
     drawnow();
 

@@ -18,7 +18,7 @@ disp(['Loaded data for day ' num2str(day)]);
 
 moisture_map=NaN(size(tbav));
 if(res==1)
-    possible_mois = 0.00:.001:5;
+    possible_mois = 0.00:.001:1;
     %         possible_mois = 0.02:.001:.5;
 else
     possible_mois = 0.02:.001:.5;
