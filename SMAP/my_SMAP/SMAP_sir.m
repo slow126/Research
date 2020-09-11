@@ -430,10 +430,15 @@ nits = 25;
 old_nsx = size(a_val,1);
 old_nsy = size(a_val,2);
 [tbav2, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav]=data_loadSIR(year,day,0,res);
-tb2_avg = nanmean(nanmean(tbav2));
-a_val = a_val * tb2_avg;
+% tb2_avg = nanmean(nanmean(tbav2));
+% a_val = a_val * tb2_avg;
 
-[a_val, junk] = compute_ave(tbval',count,pointer,aresp1,a_val, 0);
+[a_val2, junk] = compute_ave(tbval',count,pointer,aresp1,a_val, 0);
+a_val2(a_val2 == inf) = a_init;
+
+a_val = ncread('SMvb-E2T16-276-279.lis_dump.nc','ave_image');
+a_val = reshape(a_val, [nsx, nsy]);
+a_val = reshape(a_val, [old_nsx, old_nsy]);
 
 sm_start_itr = 5;
 
@@ -453,14 +458,14 @@ for its = 0:nits - 1
     [a_val, a_temp, tot, sx, sx2, total] = get_updates(tbval', ang, count, pointer, aresp1, a_val, sx, sx2, a_temp, tot, nsx, nsy);
     a_val(a_temp > 0) = a_temp(a_temp>0);
     if its == 0
-        a_val(a_val == tb2_avg * 2) = NaN;
+        a_val(a_val == anodata_A) = NaN;
     end
-    my_temp = reshape(a_val, [nsx, nsy]);
-    my_temp = flipud(my_temp');
-    figure(its+1)
-    imagesc(my_temp)
-    colorbar;
-    drawnow();
+%     my_temp = reshape(a_val, [nsx, nsy]);
+%     my_temp = flipud(my_temp');
+%     figure(its+1)
+%     imagesc(my_temp)
+%     colorbar;
+%     drawnow();
     
     if its > sm_start_itr
         a_val = reshape(a_val, [nsx, nsy]);
@@ -469,11 +474,11 @@ for its = 0:nits - 1
         a_val = reshape(a_val', [old_nsx, old_nsy]);
     end
     
-    my_temp = reshape(a_val, [nsx, nsy]);
-    my_temp = flipud(my_temp');
-    figure(nits+its+i)
-    imagesc(my_temp)
-    drawnow();
+%     my_temp = reshape(a_val, [nsx, nsy]);
+%     my_temp = flipud(my_temp');
+%     figure(nits+its+i)
+%     imagesc(my_temp)
+%     drawnow();
 
 
     

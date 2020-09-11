@@ -3,6 +3,14 @@ day = 276;
 res = 1;
 end_day = 10;
 
+if ismac
+    PATH = '/Users/low/CLionProjects/SMAP/sir/setup_files/SMvb*.setup';
+elseif isunix
+    addpath(genpath('/home/spencer/Documents/MATLAB'));
+    addpath(genpath('/media/spencer/Scratch_Disk/SMAP/sir/setup_files'));
+    PATH = '/media/spencer/Scratch_Disk/SMAP/sir/setup_files/SMvb*.setup';
+end
+
 
 for i = 1:end_day
     [tbav, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav]=data_loadSIR(year,day+i-1,0,res);
