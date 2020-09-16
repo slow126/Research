@@ -18,8 +18,8 @@ if(res==1)
         sirfolder=['smData/' num2str(year) '/' num2str(day) '/ancillarysir/'];
         smData_dir = 'smData/';
     elseif isunix
-        sirfolder=['/media/spencer/Scratch_Disk/MATLAB/SMAP/soil_moisture_matlab/smData/' num2str(year) '/' num2str(day) '/ancillarysir/'];
-        smData_dir = '/media/spencer/Scratch_Disk/MATLAB/SMAP/soil_moisture_matlab/smData/';
+        sirfolder=['/mnt/nvme1n1p1/MATLAB/SMAP/soil_moisture_matlab/smData/' num2str(year) '/' num2str(day) '/ancillarysir/'];
+        smData_dir = '/mnt/nvme1n1p1/MATLAB/SMAP/soil_moisture_matlab/smData/';
     end
     
     if(tbopt==1)

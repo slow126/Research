@@ -433,19 +433,21 @@ old_nsy = size(a_val,2);
 % tb2_avg = nanmean(nanmean(tbav2));
 % a_val = a_val * tb2_avg;
 
-[a_val2, junk] = compute_ave(tbval',count,pointer,aresp1,a_val, 0);
-a_val2(a_val2 == inf) = a_init;
+% [a_val2, junk] = compute_ave(tbval',count,pointer,aresp1,a_val, 0);
+% a_val2(a_val2 == inf) = a_init;
 
-a_val = ncread('SMvb-E2T16-276-279.lis_dump.nc','ave_image');
+read_start_day = day;
+read_end_day = read_start_day + 4; 
+a_val = ncread(strcat('/home/spencer/Documents/MATLAB/Research/SMAP/images/SMvb-E2T16-', int2str(read_start_day),'-',int2str(read_end_day),'.lis_dump.nc'),'ave_image');
 a_val = reshape(a_val, [nsx, nsy]);
 a_val = reshape(a_val, [old_nsx, old_nsy]);
 
 sm_start_itr = 5;
 
-for its = 0:nits - 1
+for its = 1:nits
     a_temp = zeros(nsize,1);
     tot = zeros(nsize,1);
-    strcat("SIRF iteration: ", string(its + 1))
+    strcat("SIRF iteration: ", string(its))
 
     if its > sm_start_itr + 1
         a_val = reshape(a_val, [nsx, nsy]);
@@ -457,7 +459,7 @@ for its = 0:nits - 1
     
     [a_val, a_temp, tot, sx, sx2, total] = get_updates(tbval', ang, count, pointer, aresp1, a_val, sx, sx2, a_temp, tot, nsx, nsy);
     a_val(a_temp > 0) = a_temp(a_temp>0);
-    if its == 0
+    if its == 1
         a_val(a_val == anodata_A) = NaN;
     end
 %     my_temp = reshape(a_val, [nsx, nsy]);
@@ -479,11 +481,6 @@ for its = 0:nits - 1
 %     figure(nits+its+i)
 %     imagesc(my_temp)
 %     drawnow();
-
-
-    
-    
-    
 end
 
 

@@ -4,7 +4,7 @@
 
 clear;
 year=2016; %Data only downloaded from 2016
-days=276:283; %Any day or range of days. Data downloaded currently from 1:31, 92:121, 183:213, 275:305 
+days=276:282; %Any day or range of days. Data downloaded currently from 1:31, 92:121, 183:213, 275:305 
 res=1; % 1=3km Sentinel/SMAP ancillary, 2=9km SMAP ancillary, 3=36km SMAP ancillary
 mapplot=0;      % Plot the resultant soil moisture plots
 ancilplot=0;    % Plot some of the ancillary data
@@ -213,23 +213,26 @@ for dayidx=1:length(days)
         colorbar
     end
     sm(my_ind).sm = moisture_map;
+    smav_range(my_ind).smav = smav;
     my_ind = my_ind + 1;
 end
 %%
+
+save('smav_range.mat','smav_range','-v7.3');
 
 totalmeanerr=totalsum/totalmeas;
 totalrmse=sqrt(totalsumsq/totalmeas);
 disp(['Total mean err=' num2str(totalmeanerr,3)]);
 disp(['Total rmse=' num2str(totalrmse,3)]);
 
-
+save('sm.mat','sm','-v7.3')
 % scatdens(smav(~isnan(error)),moisture_map(~isnan(error)));
 
-C=jet(128);
-moisture_map(isnan(moisture_map))=0;
-imwrite(im2uint8(moisture_map),C,['ims/moismap36km-' num2str(day) '.jpg']);
-smav(isnan(smav))=0;
-imwrite(im2uint8(smav),C,['ims/nsidcmap36km-' num2str(day) '.jpg']);
-error(isnan(error))=0;
-imwrite(im2uint8(error),C,['ims/errmap36km-' num2str(day) '.jpg']);
+% C=jet(128);
+% moisture_map(isnan(moisture_map))=0;
+% imwrite(im2uint8(moisture_map),C,['ims/moismap36km-' num2str(day) '.jpg']);
+% smav(isnan(smav))=0;
+% imwrite(im2uint8(smav),C,['ims/nsidcmap36km-' num2str(day) '.jpg']);
+% error(isnan(error))=0;
+% imwrite(im2uint8(error),C,['ims/errmap36km-' num2str(day) '.jpg']);
 

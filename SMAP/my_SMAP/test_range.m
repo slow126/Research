@@ -2,21 +2,28 @@ if ismac
     PATH = '/Users/low/CLionProjects/SMAP/sir/setup_files/SMvb*.setup';
 elseif isunix
     addpath(genpath('/home/spencer/Documents/MATLAB'));
-    addpath(genpath('/media/spencer/Scratch_Disk/SMAP/sir/setup_files'));
-    PATH = '/media/spencer/Scratch_Disk/SMAP/sir/setup_files/SMvb*.setup';
+    addpath(genpath('/mnt/nvme1n1p1/SMAP/sir/setup_files'));
+    PATH = '/mnt/nvme1n1p1/SMAP/sir/setup_files/SMvb*.setup';
 end
 directory = dir(PATH);
 
 if ismac
     prefix = '/Users/low/CLionProjects/SMAP/sir/setup_files/';
 elseif isunix
-    prefix = '/media/spencer/Scratch_Disk/SMAP/sir/setup_files/';
+    prefix = '/mnt/nvme1n1p1/SMAP/sir/setup_files/';
 end
 
 
-for i=1:1%length(directory)
+for i=1:length(directory)
     file = strcat(prefix, directory(i).name);
     data(i).out = SMAP_sir(file, './', 0, 2016, str2double(directory(i).name(12:14)));
 end
 
-save('data_range.mat', 'data');
+save('data_range.mat', 'data', '-v7.3');
+
+for i = 1:length(data)
+    imgs(:,:,i) = reshape(data(i).out, [11568, 4872]);
+end
+
+avg_img = nanmean(imgs,3);
+
