@@ -16,12 +16,24 @@ for i = 1:end_day
     [tbav, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav]=data_loadSIR(year,day+i-1,0,res);
     figure(1)
     imagesc(tbav);
-
-    [moisture_map] = tb2sm(tbav, year, day + i - 1, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
+    
+    tic
+    [moisture_map] = tb2sm_parallel(tbav, year, day + i - 1, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
+    toc
+    
+%     tic
+%     [moisture_map2] = tb2sm(tbav, year, day + i - 1, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
+% %     toc
+%     
+%     moisture_map(isnan(moisture_map)) = 0;
+%     moisture_map2(isnan(moisture_map2)) = 0;
+%     
+%     diff = moisture_map - moisture_map2;
+    
     figure(2)
     imagesc(moisture_map);
 
-    [tb_map] = sm2tb(moisture_map, year, day + i - 1, res, tbav, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
+    [tb_map] = sm2tb_parallel(moisture_map, year, day + i - 1, res, tbav, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
     figure(3)
     imagesc(tb_map);
 % 

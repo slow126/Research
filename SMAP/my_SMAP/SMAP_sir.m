@@ -13,6 +13,7 @@ fprintf("BYU SSM/I meta SIR/SIRF program: C version %f\n",VERSION);
 preloaded = 0
 save_workspace = 0
 res = 1;
+sm_space = 0
 
 if (~exist('setup_in', 'var') | ~exist('outpath', 'var') | ~exist('storage_option', 'var'))
     fprintf("\nusage: %s setup_in outpath storage_option\n\n",setup_in);
@@ -426,7 +427,7 @@ old_amax = a_init;
 a_temp = zeros(nsize,1);
 tot = zeros(nsize,1);
 
-nits = 25;
+nits = 100;
 old_nsx = size(a_val,1);
 old_nsy = size(a_val,2);
 [tbav2, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav]=data_loadSIR(year,day,0,res);
@@ -441,6 +442,13 @@ read_end_day = read_start_day + 4;
 a_val = ncread(strcat('/home/spencer/Documents/MATLAB/Research/SMAP/images/SMvb-E2T16-', int2str(read_start_day),'-',int2str(read_end_day),'.lis_dump.nc'),'ave_image');
 a_val = reshape(a_val, [nsx, nsy]);
 a_val = reshape(a_val, [old_nsx, old_nsy]);
+
+if sm_space == 1
+        a_val = reshape(a_val, [nsx, nsy]);
+        a_val = tb2sm(flipud(a_val'), year, day, 1, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
+        a_val = flipud(a_val);
+        a_val = reshape(a_val', [old_nsx, old_nsy]);
+end
 
 sm_start_itr = 5;
 
@@ -457,8 +465,18 @@ for its = 1:nits
     end
     
     
-    [a_val, a_temp, tot, sx, sx2, total] = get_updates(tbval', ang, count, pointer, aresp1, a_val, sx, sx2, a_temp, tot, nsx, nsy);
-    a_val(a_temp > 0) = a_temp(a_temp>0);
+    if sm_space == 1
+       update_sm = reshape(tbval, [nsx, nsy]);
+       update_sm = sm2tb(flipud(update_sm'),year, day, 1, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav); 
+       update_sm = fliup(update_sm);
+       update_sm = reshape(update_sm', [old_nsx, old_nsy]);
+       [a_val, a_temp, tot, sx, sx2, total] = get_updates(update_sm', ang, count, pointer, aresp1, a_val, sx, sx2, a_temp, tot, nsx, nsy);
+        a_val(a_temp > 0) = a_temp(a_temp>0);
+    else
+        [a_val, a_temp, tot, sx, sx2, total] = get_updates(tbval', ang, count, pointer, aresp1, a_val, sx, sx2, a_temp, tot, nsx, nsy);
+        a_val(a_temp > 0) = a_temp(a_temp>0);
+    end
+
     if its == 1
         a_val(a_val == anodata_A) = NaN;
     end
@@ -472,9 +490,12 @@ for its = 1:nits
     if its > sm_start_itr
         a_val = reshape(a_val, [nsx, nsy]);
         a_val = tb2sm(flipud(a_val'), year, day, 1, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
+        [err(its), mean_err(its)] = compute_sm_err(smav, a_val)
         a_val = flipud(a_val);
         a_val = reshape(a_val', [old_nsx, old_nsy]);
     end
+    
+    
     
 %     my_temp = reshape(a_val, [nsx, nsy]);
 %     my_temp = flipud(my_temp');

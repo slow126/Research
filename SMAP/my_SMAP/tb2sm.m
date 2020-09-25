@@ -11,6 +11,14 @@ totalsumsq=0;
 totalsum=0;
 totalmeas=0;
 
+load 'poss_emis.mat';
+poss_emis_par = poss_emis;
+clear poss_emis;
+
+% load 'dielec.mat'
+% dielec_par = dielec;
+% clear dielec;
+
 % [tbav2, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav]=data_loadSIR(year,day,0,res);
 disp(['Loaded data for day ' num2str(day)]);
 
@@ -18,12 +26,13 @@ disp(['Loaded data for day ' num2str(day)]);
 
 moisture_map=NaN(size(tbav));
 if(res==1)
-    possible_mois = 0.00:.0001:1;
+    possible_mois = 0.00:.001:1;
     %         possible_mois = 0.02:.001:.5;
 else
     possible_mois = 0.02:.001:.5;
 end
 
+count = 1;
 % We'll go pixel by pixel, but could do matrix math
 for picx=1:nsx1
     for picy=1:nsy1
@@ -72,10 +81,19 @@ for picx=1:nsx1
             continue;
         end
         
+
+           
+            
         
         dielec=sm2dc(possible_mois,localclay*ones(size(possible_mois))); %Use dielectric mixing model
         %to convert possible soil
         %moistures to emissivities
+        
+%         if(sum(dielec_par(count,:) == dielec) ~= 1001)
+%             my_stop = 1;
+%         else
+%             count = count + 1;
+%         end
         
         poss_emis=1-abs((dielec*cos(inc) - sqrt(dielec - sin(inc)^2))./(dielec*cos(inc) + sqrt(dielec - sin(inc)^2))).^2;
         %             switch pol1 %Fresnel's equations to convert emissivity to dielectric constant
@@ -87,6 +105,12 @@ for picx=1:nsx1
         %                     printf('Unrecognized polarization');
         %                     exit();
         %             end
+        
+%         if(sum(poss_emis_par(:,count) == poss_emis') ~= 1001)
+%             temp = 1;
+%         else
+%             count = count + 1;
+%         end
         
         [min_err, dif_ind] = min(abs(poss_emis-real(emis)));
         

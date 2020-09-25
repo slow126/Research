@@ -14,7 +14,7 @@ elseif isunix
 end
 
 
-for i=1:length(directory)
+for i=1:1%length(directory)
     file = strcat(prefix, directory(i).name);
     data(i).out = SMAP_sir(file, './', 0, 2016, str2double(directory(i).name(12:14)));
 end

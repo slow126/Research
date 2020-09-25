@@ -8,10 +8,12 @@ for i = 1:length(sm)
     mine(mine > 0.6) = NaN;
     [jordan_error(i).totalerr, jordan_error(i).rmse] = compute_sm_err(smav_range(i).smav, jordan(:,:,i));
     [my_error(i).totalerr, my_error(i).rmse] = compute_sm_err(smav_range(i).smav, mine(:,:,i));
+    smav_temp(:,:,i) = smav_range(i).smav;
 end
 
 jordan_avg = nanmean(jordan,3);
 mine_avg = nanmean(mine,3);
+smav_avg = nanmean(smav_temp,3);
 
 figure(1)
 imagesc(jordan_avg)
@@ -28,4 +30,12 @@ diff = jordan_avg - mine_avg;
 figure(3)
 imagesc(diff)
 title('Diff')
+title('Diff between mine and Jordans')
 
+figure(4)
+imagesc(smav_avg - mine_avg)
+title('Diff between mine and SMAP')
+
+figure(5)
+imagesc(smav_avg - jordan_avg)
+title('Diff between Jordan and SMAP')

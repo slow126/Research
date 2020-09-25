@@ -12,5 +12,7 @@ my_count = zeros(size(b_val,1),size(b_val,2));
     end
     b_val = b_val ./ (my_count);
     
+    measurement * response / sum(response)
+    
 end
 
