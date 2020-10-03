@@ -13,7 +13,7 @@ fprintf("BYU SSM/I meta SIR/SIRF program: C version %f\n",VERSION);
 preloaded = 0
 save_workspace = 0
 res = 1;
-sm_space = 0
+sm_space = 1
 
 if (~exist('setup_in', 'var') | ~exist('outpath', 'var') | ~exist('storage_option', 'var'))
     fprintf("\nusage: %s setup_in outpath storage_option\n\n",setup_in);
@@ -427,7 +427,7 @@ old_amax = a_init;
 a_temp = zeros(nsize,1);
 tot = zeros(nsize,1);
 
-nits = 100;
+nits = 400;
 old_nsx = size(a_val,1);
 old_nsy = size(a_val,2);
 [tbav2, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav]=data_loadSIR(year,day,0,res);
@@ -440,18 +440,30 @@ old_nsy = size(a_val,2);
 read_start_day = day;
 read_end_day = read_start_day + 4; 
 a_val = ncread(strcat('/home/spencer/Documents/MATLAB/Research/SMAP/images/SMvb-E2T16-', int2str(read_start_day),'-',int2str(read_end_day),'.lis_dump.nc'),'ave_image');
+a_val(a_val == 100) = NaN;
 a_val = reshape(a_val, [nsx, nsy]);
 a_val = reshape(a_val, [old_nsx, old_nsy]);
 
 if sm_space == 1
         a_val = reshape(a_val, [nsx, nsy]);
-        a_val = tb2sm(flipud(a_val'), year, day, 1, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
+        a_val = tb2sm_parallel(flipud(a_val'), year, day, 1, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, 0:.001:0.6);
         a_val = flipud(a_val);
+        a_val(a_val == 0) = NaN;
         a_val = reshape(a_val', [old_nsx, old_nsy]);
+        update_sm = tb2sm_measurements(tbval, pointer, aresp1, year, day, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, 0:.001:0.6);
+        update_sm = (update_sm * 100);
+
 end
 
-sm_start_itr = 5;
+sm_start_itr = nits + 1;
+% % a_val = ones(size(a_val)) * .01;
+% a_val(~isnan(a_val)) = 0.01;
 
+a_val = a_val .* 100;
+poss_mois = 0:.001:1;
+
+
+err = zeros(1,nits);
 for its = 1:nits
     a_temp = zeros(nsize,1);
     tot = zeros(nsize,1);
@@ -459,18 +471,15 @@ for its = 1:nits
 
     if its > sm_start_itr + 1
         a_val = reshape(a_val, [nsx, nsy]);
-        a_val = sm2tb(flipud(a_val'), year, day, 1, tbav2, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
+        a_val = sm2tb_v2(flipud(a_val'), year, day, 1, tbav2, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
         a_val = flipud(a_val);
         a_val = reshape(a_val', [old_nsx, old_nsy]);
     end
     
-    
     if sm_space == 1
-       update_sm = reshape(tbval, [nsx, nsy]);
-       update_sm = sm2tb(flipud(update_sm'),year, day, 1, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav); 
-       update_sm = fliup(update_sm);
-       update_sm = reshape(update_sm', [old_nsx, old_nsy]);
-       [a_val, a_temp, tot, sx, sx2, total] = get_updates(update_sm', ang, count, pointer, aresp1, a_val, sx, sx2, a_temp, tot, nsx, nsy);
+%        update_sm = tb2sm_measurements(tbval, pointer, aresp1, year, day, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, 0:.001:1);
+%        update_sm = update_sm;
+        [a_val, a_temp, tot, sx, sx2, total] = get_updates(update_sm', ang, count, pointer, aresp1, a_val, sx, sx2, a_temp, tot, nsx, nsy);
         a_val(a_temp > 0) = a_temp(a_temp>0);
     else
         [a_val, a_temp, tot, sx, sx2, total] = get_updates(tbval', ang, count, pointer, aresp1, a_val, sx, sx2, a_temp, tot, nsx, nsy);
@@ -487,12 +496,37 @@ for its = 1:nits
 %     colorbar;
 %     drawnow();
     
+%     if(its > sm_start_itr + 1)
+%         if (err(its - 1) == err(its - 2) && err(its - 1) ~= 0)
+%             poss_mois = nanmin(a_val):.0001:nanmax(a_val);
+%         end
+%     else
+%         poss_mois = 0:.001:1;
+%     end
+    
+%     if sm_space == 1 & its > 1
+%         temp2 = reshape(a_val,[nsx, nsy]);
+%         temp2 = flipud(temp2');
+%         [mean_err_temp(its), rms_err_temp(its)] = compute_sm_err(temp2, temp)
+%     end
+    
     if its > sm_start_itr
         a_val = reshape(a_val, [nsx, nsy]);
-        a_val = tb2sm(flipud(a_val'), year, day, 1, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
+        a_val = tb2sm_parallel(flipud(a_val'), year, day, 1, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, poss_mois);
         [err(its), mean_err(its)] = compute_sm_err(smav, a_val)
         a_val = flipud(a_val);
         a_val = reshape(a_val', [old_nsx, old_nsy]);
+    elseif(sm_space == 1)
+        temp = reshape(a_val,[nsx, nsy]);
+        temp = flipud(temp');
+%         temp(temp == 0) = NaN;
+        temp = (temp) / 100;
+        smav_temp = smav;
+        smav_temp(smav_temp > 0.5) = NaN;
+        smav_mean = nanmean(nanmean(smav))
+        temp_mean = nanmean(nanmean(temp))
+        a_val_mean = nanmean(nanmean(a_val))
+        [mean_err(its), rms_err(its)] = compute_sm_err(smav, temp)
     end
     
     

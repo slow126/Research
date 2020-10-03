@@ -1,4 +1,4 @@
-function [a_val, a_temp, tot, sx, sx2, total] = get_updates(power, ang, count,...
+function [a_val, a_temp, tot, sx, sx2, total] = get_meas_updates(power, ang, count,...
     fill_array, response_array, a_val, sx, sx2, a_temp, tot, junk1, junk2)
 
 total = zeros(length(fill_array),1);
@@ -16,9 +16,8 @@ ave = zeros(length(fill_array), 1);
 
 
 for i = 1:length(fill_array)
-    total(i) = nansum(response_array(i).resp .* a_val(fill_array(i).pt));
-    num(i) = nansum(response_array(i).resp);
-
+    total(i) = sum(response_array(i).resp .* a_val(fill_array(i).pt));
+    num(i) = sum(response_array(i).resp);
 end
 
 ave = total ./ num;

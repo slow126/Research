@@ -1,4 +1,4 @@
-function [moisture_map] = tb2sm_parallel(tbav, year, day, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, possible_mois)
+function [sm_meas] = tb2sm_measurements(tbav, fill_array, resp_array, year, day, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, possible_mois)
 % year=2016; %Data only downloaded from 2016
 % days=277:285; %Any day or range of days. Data downloaded currently from 1:31, 92:121, 183:213, 275:305
 % res=1; % 1=3km Sentinel/SMAP ancillary, 2=9km SMAP ancillary, 3=36km SMAP ancillary
@@ -14,7 +14,21 @@ totalmeas=0;
 % [tbav2, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav]=data_loadSIR(year,day,0,res);
 disp(['Loaded data for day ' num2str(day)]);
 
+tb_temp = zeros(1, size(incav,1) * size(incav,2));
+meas_len = length(tbav);
+for i = 1:length(tbav)
+    tb_temp(fill_array(i).pt(1)) = tbav(i);
+end
+
+tbav = tb_temp;
+tbav = reshape(tbav, fliplr(size(incav)));
+tbav = flipud(tbav');
+tbav(tbav == 0) = NaN;
+
+
 [ nsy1 , nsx1 ] = size(tbav);
+
+
 
 moisture_map=NaN(size(tbav));
 % if(res==1)
@@ -93,6 +107,17 @@ moisture_map=NaN(size(tbav));
         
         emis_vec = emis_vec(good);
         
+        moisture_map = flipud(moisture_map);
+        moisture_map = moisture_map';
+        moisture_map = reshape(moisture_map, 1, length(tb_temp));
+        
+        sm_meas = zeros(1, meas_len);
+        for i = 1:meas_len
+            sm_meas(i) = moisture_map(fill_array(i).pt(1));
+        end
+
+
+        junk = 1;
 %         save('poss_emis.mat','poss_emis', '-v7.3');
 %         save('dielec.mat','dielec', '-v7.3');
         
@@ -110,4 +135,3 @@ moisture_map=NaN(size(tbav));
     
     
 end
-

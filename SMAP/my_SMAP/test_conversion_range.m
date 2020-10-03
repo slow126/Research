@@ -33,7 +33,7 @@ for i = 1:end_day
     figure(2)
     imagesc(moisture_map);
 
-    [tb_map] = sm2tb_parallel(moisture_map, year, day + i - 1, res, tbav, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
+    [tb_map] = sm2tb_v2(moisture_map, year, day + i - 1, res, tbav, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
     figure(3)
     imagesc(tb_map);
 % 

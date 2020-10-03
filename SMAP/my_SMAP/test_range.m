@@ -1,4 +1,4 @@
-if ismac
+ if ismac
     PATH = '/Users/low/CLionProjects/SMAP/sir/setup_files/SMvb*.setup';
 elseif isunix
     addpath(genpath('/home/spencer/Documents/MATLAB'));

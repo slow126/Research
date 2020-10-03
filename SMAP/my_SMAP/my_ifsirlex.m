@@ -1,4 +1,4 @@
-function [x, y] = ifsirlex(m,head)
+function [x, y] = my_ifsirlex(m, nsx, nsy)
 %
 %  function [x y] = isirlex(m,head)
 %
@@ -14,8 +14,8 @@ function [x, y] = ifsirlex(m,head)
 %   x,y  - x,y location of pixels (matlab convention)
 %
 
-nsx=head(1);
-nsy=head(2);
+% nsx=head(1);
+% nsy=head(2);
 
 m1=m(find(m < Inf));
  
