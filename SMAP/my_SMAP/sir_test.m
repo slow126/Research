@@ -1,4 +1,4 @@
-function [a_val] = SMAP_sir(setup_in, outpath, storage_option, year, day)
+function [a_val] = sir_test(setup_in, outpath, storage_option, year, day)
 VERSION = 1.3;
 CREATE_NON = 1;
 anodata_A=100.0;
@@ -427,7 +427,7 @@ old_amax = a_init;
 a_temp = zeros(nsize,1);
 tot = zeros(nsize,1);
 
-nits = 400;
+nits = 10;
 old_nsx = size(a_val,1);
 old_nsy = size(a_val,2);
 [tbav2, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav]=data_loadSIR(year,day,0,res);
@@ -447,13 +447,13 @@ a_val = reshape(a_val, [nsx, nsy]);
 a_val = reshape(a_val, [old_nsx, old_nsy]);
 
 if sm_space == 1
-        a_val = reshape(a_val, [nsx, nsy]);
-        a_val = tb2sm_parallel(flipud(a_val'), year, day, 1, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, 0:.001:0.6);
-        a_val = flipud(a_val);
-        a_val(a_val == 0) = NaN;
-        a_val = reshape(a_val', [old_nsx, old_nsy]);
+%         a_val = reshape(a_val, [nsx, nsy]);
+%         a_val = tb2sm_parallel(flipud(a_val'), year, day, 1, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, 0:.001:0.6);
+%         a_val = flipud(a_val);
+%         a_val(a_val == 0) = NaN;
+%         a_val = reshape(a_val', [old_nsx, old_nsy]);
         update_sm = tb2sm_measurements(tbval, pointer, aresp1, year, day, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, 0:.001:0.6);
-        compute_ave(update_sm, pointer, aresp1, a_val);
+        ave = compute_ave(update_sm, pointer, aresp1, a_val);
         update_sm = (update_sm * 100);
         
 end

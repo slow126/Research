@@ -1,4 +1,6 @@
  if ismac
+    addpath(genpath('/Users/low/Documents/MATLAB'));
+    addpath(genpath('/Users/low/CLionProjects/SMAP/sir/setup_files/'));
     PATH = '/Users/low/CLionProjects/SMAP/sir/setup_files/SMvb*.setup';
 elseif isunix
     addpath(genpath('/home/spencer/Documents/MATLAB'));
@@ -16,6 +18,7 @@ end
 
 for i=1:1%length(directory)
     file = strcat(prefix, directory(i).name);
+    test = sir_test(file, './', 0, 2016, str2double(directory(i).name(12:14)));
     data(i).out = SMAP_sir(file, './', 0, 2016, str2double(directory(i).name(12:14)));
 end
 
