@@ -27,7 +27,6 @@ function [mean_err, rmse] = compute_sm_err(img1, img2)
 %     img1_mean = nanmean(nanmean(img1))
 %     img2_mean = nanmean(nanmean(img2))
     
-    diff_sum = nansum(nansum(abs(img1 - img2)))
     error=img1-img2;
     cursum=nansum(reshape(abs(error),1,[]));
     cursumsq=nansum(reshape(abs(error).^2,1,[]));

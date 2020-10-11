@@ -1,4 +1,4 @@
-function [a_val] = sir_test(setup_in, outpath, storage_option, year, day)
+function [a_val] = sir_test_v2(setup_in, outpath, storage_option, year, day)
 VERSION = 1.3;
 CREATE_NON = 1;
 anodata_A=100.0;
@@ -454,9 +454,10 @@ if sm_space == 1
 %         a_val = flipud(a_val);
 %         a_val(a_val == 0) = NaN;
 %         a_val = reshape(a_val', [old_nsx, old_nsy]);
-        [update_sm, sm_pointer, sm_aresp1, data_idx] = tb2sm_measurements(tbval, pointer, aresp1, year, day, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, 0:.001:0.6);
+        [update_sm, sm_pointer, sm_aresp1, data_idx, sm_footprints] = tb2sm_measurements_v2(tbval, pointer, aresp1, year, day, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, 0:.001:0.6);
         update_sm_mean = nanmean(reshape(update_sm,1,[]))
-
+        
+        junk = compute_ave_v2(update_sm,sm_pointer,sm_aresp1,a_val,sm_footprints);
 
         junk = zeros(size(a_val));
         for i = 1:length(update_sm)
@@ -605,14 +606,3 @@ save('a_val.mat','a_val')
 % imagesc(temp2 + ancil)
 % colormap(gray)
 end
-
-
-
-
-
-
-
-
-
-
-

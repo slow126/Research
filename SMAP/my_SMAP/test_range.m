@@ -18,8 +18,8 @@ end
 
 for i=1:1%length(directory)
     file = strcat(prefix, directory(i).name);
-    test = sir_test(file, './', 0, 2016, str2double(directory(i).name(12:14)));
-    data(i).out = SMAP_sir(file, './', 0, 2016, str2double(directory(i).name(12:14)));
+    test = sir_test_v2(file, './', 0, 2016, str2double(directory(i).name(12:14)));
+%     data(i).out = SMAP_sir(file, './', 0, 2016, str2double(directory(i).name(12:14)));
 end
 
 save('data_range.mat', 'data', '-v7.3');

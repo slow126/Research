@@ -21,7 +21,7 @@ wfraccorrect=1;
         quality=round(qualav); %read the retrieval quality
         
         if(res==1)
-            badqual=~(quality ~= 0) .* (quality ~= 16) .* (quality ~= 6) .* (quality ~= 80);
+            badqual=~(quality ~= 0) .* (quality ~= 16) .* (quality ~= 64) .* (quality ~= 80);
         else
             badqual=~(quality ~= 0) .* (quality ~= 8);
         end

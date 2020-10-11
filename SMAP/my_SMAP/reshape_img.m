@@ -5,7 +5,7 @@ if (nsx ~= 1) && (nsy ~= 1)
 else
     img = flipud(img);
     img = img';
-    img = reshape(img, [nsx, nsy]);
+    img = reshape(img, 1, []);
 end
 
 end

@@ -13,7 +13,7 @@ fprintf("BYU SSM/I meta SIR/SIRF program: C version %f\n",VERSION);
 preloaded = 0
 save_workspace = 0
 res = 1;
-sm_space = 1
+sm_space = 0
 
 if (~exist('setup_in', 'var') | ~exist('outpath', 'var') | ~exist('storage_option', 'var'))
     fprintf("\nusage: %s setup_in outpath storage_option\n\n",setup_in);
@@ -430,7 +430,7 @@ tot = zeros(nsize,1);
 nits = 400;
 old_nsx = size(a_val,1);
 old_nsy = size(a_val,2);
-[tbav2, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav]=data_loadSIR(year,day,0,res);
+[tbav2, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav]=data_loadSIR(year,day + 1,0,res);
 % tb2_avg = nanmean(nanmean(tbav2));
 % a_val = a_val * tb2_avg;
 
@@ -442,7 +442,8 @@ read_end_day = read_start_day + 4;
 if ~ismac
     a_val = ncread(strcat('/home/spencer/Documents/MATLAB/Research/SMAP/images/SMvb-E2T16-', int2str(read_start_day),'-',int2str(read_end_day),'.lis_dump.nc'),'ave_image');
 end
-a_val(a_val == 100) = NaN;
+% a_val = zeros(shape(a_val));
+a_val(a_val == 100) = 0;
 a_val = reshape(a_val, [nsx, nsy]);
 a_val = reshape(a_val, [old_nsx, old_nsy]);
 
@@ -453,28 +454,30 @@ if sm_space == 1
         a_val(a_val == 0) = NaN;
         a_val = reshape(a_val', [old_nsx, old_nsy]);
         update_sm = tb2sm_measurements(tbval, pointer, aresp1, year, day, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, 0:.001:0.6);
-        compute_ave(update_sm, pointer, aresp1, a_val);
+        a_val = compute_ave(update_sm, pointer, aresp1, a_val);
         update_sm = (update_sm * 100);
+        a_val = a_val .* 100;
+
         
 end
 
-sm_start_itr = nits + 1;
+sm_start_itr = 1;
 % % a_val = ones(size(a_val)) * .01;
 % a_val(~isnan(a_val)) = 0.01;
 
-a_val = a_val .* 100;
 poss_mois = 0:.001:1;
 
 
-err = zeros(1,nits);
+% err = zeros(1,nits);
 for its = 1:nits
     a_temp = zeros(nsize,1);
     tot = zeros(nsize,1);
     strcat("SIRF iteration: ", string(its))
 
-    if its > sm_start_itr + 1
+    if its >= sm_start_itr + 1
         a_val = reshape(a_val, [nsx, nsy]);
         a_val = sm2tb_v2(flipud(a_val'), year, day, 1, tbav2, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
+%         a_val = sm2tb_v2(flipud(a_val'), year, day, 1, tbav2, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
         a_val = flipud(a_val);
         a_val = reshape(a_val', [old_nsx, old_nsy]);
     end
@@ -487,10 +490,16 @@ for its = 1:nits
     else
         [a_val, a_temp, tot, sx, sx2, total] = get_updates(tbval', ang, count, pointer, aresp1, a_val, sx, sx2, a_temp, tot, nsx, nsy);
         a_val(a_temp > 0) = a_temp(a_temp>0);
+%         a_val_mean = nanmean(a_val)
+%         tbval_mean = nanmean(tbval)
+%         tbav2_mean = nanmean(reshape(tbav2,1,[]))
+        temp = reshape(a_val,[nsx, nsy]);
+        temp = flipud(temp');
+        [mean_err(its), rms_err(its)] = compute_sm_err(tbav2, temp)
     end
 
     if its == 1
-        a_val(a_val == anodata_A) = NaN;
+        a_val(a_val == anodata_A) = 0;
     end
 %     my_temp = reshape(a_val, [nsx, nsy]);
 %     my_temp = flipud(my_temp');
@@ -513,7 +522,7 @@ for its = 1:nits
 %         [mean_err_temp(its), rms_err_temp(its)] = compute_sm_err(temp2, temp)
 %     end
     
-    if its > sm_start_itr
+    if its >= sm_start_itr
         a_val = reshape(a_val, [nsx, nsy]);
         a_val = tb2sm_parallel(flipud(a_val'), year, day, 1, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, poss_mois);
         [err(its), mean_err(its)] = compute_sm_err(smav, a_val)
@@ -523,13 +532,13 @@ for its = 1:nits
         temp = reshape(a_val,[nsx, nsy]);
         temp = flipud(temp');
 %         temp(temp == 0) = NaN;
-        temp = (temp) / 100;
+%         temp = (temp) / 100;
         smav_temp = smav;
         smav_temp(smav_temp > 0.5) = NaN;
         smav_mean = nanmean(nanmean(smav))
         temp_mean = nanmean(nanmean(temp))
         a_val_mean = nanmean(nanmean(a_val))
-        [mean_err(its), rms_err(its)] = compute_sm_err(smav, temp)
+        [mean_err(its), rms_err(its)] = compute_sm_err((smav * 100), temp)
     end
     
     

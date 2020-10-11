@@ -18,28 +18,45 @@ for i = 1:end_day
     imagesc(tbav);
     
     tic
-    [moisture_map] = tb2sm_parallel(tbav, year, day + i - 1, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
+    [moisture_map] = tb2sm_parallel(tbav, year, day + i - 1, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, 0:.001:1);
     toc
     
 %     tic
-%     [moisture_map2] = tb2sm(tbav, year, day + i - 1, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
+    [moisture_map2] = tb2sm(tbav, year, day + i - 1, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
 % %     toc
 %     
-%     moisture_map(isnan(moisture_map)) = 0;
-%     moisture_map2(isnan(moisture_map2)) = 0;
-%     
-%     diff = moisture_map - moisture_map2;
+    moisture_map(isnan(moisture_map)) = 0;
+    moisture_map2(isnan(moisture_map2)) = 0;
+    
+    diff = moisture_map - moisture_map2;
     
     figure(2)
     imagesc(moisture_map);
 
     [tb_map] = sm2tb_v2(moisture_map, year, day + i - 1, res, tbav, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
+    
+    [tb_map2] = sm2tb(moisture_map, year, day + i - 1, res, tbav, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
+    
+    diff2 = tb_map - tb_map2;
+
     figure(3)
     imagesc(tb_map);
-% 
-%     [moisture_map] = tb2sm(tb_map, year, day, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
-%     figure(2)
-%     imagesc(moisture_map);
+
+    
+    [moisture_map] = tb2sm_parallel(tb_map, year, day + i - 1, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, 0:.001:1);
+
+    [moisture_map2] = tb2sm(tb_map2, year, day + i - 1, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
+
+    
+    [tb_map] = sm2tb_v2(moisture_map, year, day + i - 1, res, tbav, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
+    
+    [tb_map2] = sm2tb(moisture_map2, year, day + i - 1, res, tbav, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
+    
+    
+    
+    diff2 = tb_map - tb_map2;
+
+    
     
     sm(i).mois = moisture_map;
     tb2(i).tb = tb_map;

@@ -1,4 +1,4 @@
-function [sm_meas] = tb2sm_measurements(tbav, fill_array, resp_array, year, day, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, possible_mois)
+function [sm_meas, sm_fill_array, sm_response_array, data_idx] = tb2sm_measurements(tbav, fill_array, resp_array, year, day, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, possible_mois)
 % year=2016; %Data only downloaded from 2016
 % days=277:285; %Any day or range of days. Data downloaded currently from 1:31, 92:121, 183:213, 275:305
 % res=1; % 1=3km Sentinel/SMAP ancillary, 2=9km SMAP ancillary, 3=36km SMAP ancillary
@@ -13,6 +13,7 @@ totalmeas=0;
 
 % [tbav2, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav]=data_loadSIR(year,day,0,res);
 disp(['Loaded data for day ' num2str(day)]);
+tbval = tbav;
 
 tb_temp = zeros(1, size(incav,1) * size(incav,2));
 meas_len = length(tbav);
@@ -42,7 +43,7 @@ moisture_map=NaN(size(tbav));
         quality=round(qualav); %read the retrieval quality
         
         if(res==1)
-            badqual=~(quality ~= 0) .* (quality ~= 16) .* (quality ~= 6) .* (quality ~= 80);
+            badqual=~(quality ~= 0) .* (quality ~= 16) .* (quality ~= 64) .* (quality ~= 80);
         else
             badqual=~(quality ~= 0) .* (quality ~= 8);
         end
@@ -52,6 +53,32 @@ moisture_map=NaN(size(tbav));
                 .* ~isnan(albav) .* ~isnan(vopav) .* ~isnan(inc) .* ~isnan(rghav); % .* badqual ;
 %             continue; %skip if we don't have all necessary info, or bad quality
         good_pixels(good_pixels == 0) = NaN;
+        
+%         figure(1)
+%         imagesc(~(wfracav > 0))
+%         drawnow
+%         
+%         figure(2)
+%         imagesc(~isnan(tbav))
+%         
+%         figure(3)
+%         imagesc(~isnan(clayf))
+%         
+%         figure(4)
+%         imagesc(~isnan(tempav))
+%         
+%         figure(5)
+%         imagesc(~isnan(albav))
+%         
+%         figure(6)
+%         imagesc(~isnan(vopav))
+%         
+%         figure(7)
+%         imagesc(~isnan(inc))
+%         
+%         figure(8)
+%         imagesc(~isnan(rghav))
+%         drawnow
         
         
         
@@ -111,26 +138,35 @@ moisture_map=NaN(size(tbav));
         moisture_map = moisture_map';
         moisture_map = reshape(moisture_map, 1, length(tb_temp));
         
-        sm_meas = zeros(1, meas_len);
+        
+        sm_meas = zeros(1, nansum(moisture_map ~= 0));
+%         for i = 1:meas_len
+%             sm_meas(i) = moisture_map(fill_array(i).pt(1));
+%         end
+        
+%         sm_fill_array = fill_array;
+%         sm_response_array = resp_array;
+        
+%         data_idx = sm_meas;
+        j = 1;
         for i = 1:meas_len
-            sm_meas(i) = moisture_map(fill_array(i).pt(1));
+            if moisture_map(fill_array(i).pt(1)) ~= 0
+                sm_meas(j) = moisture_map(fill_array(i).pt(1));
+                data_idx(j) = i;
+                j = j+1;
+            end
         end
+%         
+%         
+% 
+        sm_fill_array = fill_array(data_idx);
+        sm_response_array = resp_array(data_idx);  
+        
+%         tbval_mean = nanmean(tbval(data_idx))
 
 
         junk = 1;
-%         save('poss_emis.mat','poss_emis', '-v7.3');
-%         save('dielec.mat','dielec', '-v7.3');
-        
-        
-        %to convert possible soil
-        %moistures to emissivities
-        
-%         poss_emis=1-abs((dielec.*cos(inc) - (dielec - sin(inc).^2).^0.5)./(dielec.*cos(inc) + (dielec - sin(inc).^2).^0.5)).^2;
-% 
-%         
-%         [min_err, dif_ind] = min(abs(poss_emis-real(emis)));
-%         
-%         moisture_map(picy,picx)=possible_mois(dif_ind); %Store the final soil moisture value
+
 
     
     
