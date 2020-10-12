@@ -11,6 +11,8 @@ totalsumsq=0;
 totalsum=0;
 totalmeas=0;
 
+[ nsy1 , nsx1 ] = size(tempav);
+
 % [tbav2, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav]=data_loadSIR(year,day,0,res);
 disp(['Loaded data for day ' num2str(day)]);
 tbval = tbav;
@@ -22,12 +24,11 @@ for i = 1:length(tbav)
 end
 
 tbav = tb_temp;
-tbav = reshape(tbav, fliplr(size(incav)));
-tbav = flipud(tbav');
+tbav = reshape_img(tbav, nsx1, nsy1);
 tbav(tbav == 0) = NaN;
 
 
-[ nsy1 , nsx1 ] = size(tbav);
+
 
 
 
@@ -67,6 +68,10 @@ moisture_map=NaN(size(tbav));
             end
         end
         
+        moisture_img = zeros(size(tbav));
+        for i = length(data_idx):-1:1
+            moisture_img(fill_array(data_idx(i)).pt(1)) = tbav(data_idx(i));
+        end
         
         for i = length(data_idx):-1:1
             footprint = tbav(fill_array(data_idx(i)).pt(1)) .* resp_array(data_idx(i)).resp;

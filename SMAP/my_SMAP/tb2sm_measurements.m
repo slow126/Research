@@ -17,6 +17,13 @@ tbval = tbav;
 
 tb_temp = zeros(1, size(incav,1) * size(incav,2));
 meas_len = length(tbav);
+
+junk = zeros(size(incav));
+for i = 1:length(tbval)
+%     junk(my_ifsirlex(i,size(junk,2),size(junk,1))) = tbval(i);
+    junk(my_ifsirlex(fill_array(i).pt,size(junk,2),size(junk,1))) = tbval(i);
+end
+
 for i = 1:length(tbav)
     tb_temp(fill_array(i).pt(1)) = tbav(i);
 end
@@ -140,6 +147,7 @@ moisture_map=NaN(size(tbav));
         
         
         sm_meas = zeros(1, nansum(moisture_map ~= 0));
+        
 %         for i = 1:meas_len
 %             sm_meas(i) = moisture_map(fill_array(i).pt(1));
 %         end
@@ -148,19 +156,19 @@ moisture_map=NaN(size(tbav));
 %         sm_response_array = resp_array;
         
 %         data_idx = sm_meas;
-        j = 1;
-        for i = 1:meas_len
-            if moisture_map(fill_array(i).pt(1)) ~= 0
-                sm_meas(j) = moisture_map(fill_array(i).pt(1));
-                data_idx(j) = i;
-                j = j+1;
-            end
-        end
-%         
-%         
-% 
-        sm_fill_array = fill_array(data_idx);
-        sm_response_array = resp_array(data_idx);  
+%         j = 1;
+%         for i = 1:meas_len
+%             if moisture_map(fill_array(i).pt(1)) ~= 0
+%                 sm_meas(j) = moisture_map(fill_array(i).pt(1));
+%                 data_idx(j) = i;
+%                 j = j+1;
+%             end
+%         end
+% %         
+% %         
+% % 
+%         sm_fill_array = fill_array(data_idx);
+%         sm_response_array = resp_array(data_idx);  
         
 %         tbval_mean = nanmean(tbval(data_idx))
 
