@@ -21,11 +21,12 @@ meas_len = length(tbav);
 junk = zeros(size(incav));
 for i = 1:length(tbval)
 %     junk(my_ifsirlex(i,size(junk,2),size(junk,1))) = tbval(i);
-    junk(my_ifsirlex(fill_array(i).pt,size(junk,2),size(junk,1))) = tbval(i);
+    [x,y] = my_ifsirlex(fill_array(i).pt,size(junk,1),size(junk,2));
+    junk(x(1),y(1)) = tbval(i);
 end
 
 for i = 1:length(tbav)
-    tb_temp(fill_array(i).pt(1)) = tbav(i);
+    tb_temp(fill_array(i).pt(1) + 1) = tbav(i);
 end
 
 tbav = tb_temp;
