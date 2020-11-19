@@ -35,7 +35,7 @@ moisture_map=NaN(size(tbav));
         
         good_pixels = ones(size(tbav,1),size(tbav,2));
         good_pixels = good_pixels .* ~((wfracav > 0) .* wfraccorrect) .* ~isnan(tbav) .* ~isnan(clayf) .* ~isnan(tempav) ...
-                .* ~isnan(albav) .* ~isnan(vopav) .* ~isnan(inc) .* ~isnan(rghav) .* badqual ;
+                .* ~isnan(albav) .* ~isnan(vopav) .* ~isnan(inc) .* ~isnan(rghav);% .* badqual ;
 %             continue; %skip if we don't have all necessary info, or bad quality
         good_pixels(good_pixels == 0) = NaN;
         

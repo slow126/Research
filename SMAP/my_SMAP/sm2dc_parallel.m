@@ -32,10 +32,10 @@ dcArray=nan(size(smArray));
         ku=(sqrt(sqrt(eps1u.^2+eps2u.^2)-eps1u))./sqrt(2);
         
 
-        nm = zeros(size(smArray,1),size(smArray,2));
-        km = zeros(size(smArray,1),size(smArray,2));
-        real_part = zeros(size(smArray,1),size(smArray,2));
-        im_part = zeros(size(smArray,1),size(smArray,2));
+%         nm = zeros(size(smArray,1),size(smArray,2));
+%         km = zeros(size(smArray,1),size(smArray,2));
+%         real_part = zeros(size(smArray,1),size(smArray,2));
+%         im_part = zeros(size(smArray,1),size(smArray,2));
         
 
             

@@ -63,7 +63,7 @@ wfraccorrect=1;
             
             mois_ind = zeros(1, length(good));
             parfor i = 1:length(mois_ind)
-                mois_ind(i) = find(moisture_map(good(i)) == possible_mois); %Store the final soil moisture value
+                [min, mois_ind(i)] = nanmin(moisture_map(good(i)) - possible_mois); %Store the final soil moisture value
             end
             
             idx = sub2ind(size(poss_emis), mois_ind, 1:length(mois_ind));

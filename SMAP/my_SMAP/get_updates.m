@@ -16,7 +16,13 @@ ave = zeros(length(fill_array), 1);
 
 
 for i = 1:length(fill_array)
+    mask = ~isnan(a_val(fill_array(i).pt));
+    
+    response_array(i).resp = response_array(i).resp(find(mask));
+    fill_array(i).pt = fill_array(i).pt(find(mask));
+    
     total(i) = nansum(response_array(i).resp .* a_val(fill_array(i).pt));
+%     mask = ~isnan(a_val(fill_array(i).pt));
     num(i) = nansum(response_array(i).resp);
 
 end
@@ -25,18 +31,28 @@ ave = total ./ num;
 update_idx = ones(size(ave,1), size(ave,2));
 update_idx(ave == 0) = 0;
 
-scale = power ./ ave;
+scale = power ./ ave; % Look at scale for the two pixels. Should be around 1. 
 % update = zeros(size(scale,1),size(scale,2));
 
 scale(scale > 0) = sqrt(scale(scale > 0));
+% scale(scale > 0) = (scale(scale > 0)) .^ .25;
 scale(scale <= 0) = 1;
 
 for i=1:length(scale)
-    if scale(i) > 1
+    
+    
+    if scale(i) >= 1
         update(i).upd = 1.0./((0.5./ave(i))*(1.0-1.0./scale(i))+1.0./((a_val(fill_array(i).pt) * scale(i))));
     else
         update(i).upd =  0.5 * ave(i) * (1.0 - scale(i)) + (a_val(fill_array(i).pt)) * scale(i);
     end
+    
+    if(sum(fill_array(i).pt == 44619161) > 1)
+        junk = 1;
+    elseif(sum(fill_array(i).pt == 44410983) > 1)
+        junk = 1;
+    end
+    
     
     tot(fill_array(i).pt) = tot(fill_array(i).pt) + response_array(i).resp;
     test = (a_temp(fill_array(i).pt) .* (tot(fill_array(i).pt) - response_array(i).resp) + update(i).upd .* response_array(i).resp) ./ tot(fill_array(i).pt);
@@ -46,10 +62,12 @@ for i=1:length(scale)
     
 %     temp4 = a_val;
 %     temp4(a_temp > 0) = a_temp(a_temp > 0);
-%     temp3 = reshape(temp4, [316, 158]);
+%     temp3 = reshape(temp4, [11568, 4872]);
+%     temp3 = flipud(temp3');
 %     figure(3)
 %     imagesc(temp3)
 %     colormap(gray)
+%     drawnow
 % %     impixelinfo
     
     %

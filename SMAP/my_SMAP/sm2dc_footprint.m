@@ -32,10 +32,10 @@ dcArray=nan(size(smArray));
         ku=(sqrt(sqrt(eps1u.^2+eps2u.^2)-eps1u))./sqrt(2);
         
 
-%         nm = zeros(length(smArray),length(clayfrac));
-%         km = zeros(length(smArray),length(clayfrac));
-%         real_part = zeros(length(smArray),length(clayfrac));
-%         im_part = zeros(length(smArray),length(clayfrac));
+%         nm = zeros(size(smArray,1),size(smArray,2));
+%         km = zeros(size(smArray,1),size(smArray,2));
+%         real_part = zeros(size(smArray,1),size(smArray,2));
+%         im_part = zeros(size(smArray,1),size(smArray,2));
         
 
             
@@ -57,11 +57,7 @@ dcArray=nan(size(smArray));
                 km(great_ind) = kd(i)+kb(i)*mvt(i) + ku(i)*(smArray(great_ind)-mvt(i));
                 real_part(great_ind) = nm(great_ind).^2-km(great_ind).^2;
                 im_part(great_ind) = 2.*nm(great_ind).*km(great_ind);
-                dcArray(i,:)=(real_part+1i*im_part)';
+                dcArray(i,:)=real_part+1i*im_part;
             end
             
 
-
-
-
-end

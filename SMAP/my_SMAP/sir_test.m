@@ -427,7 +427,7 @@ old_amax = a_init;
 a_temp = zeros(nsize,1);
 tot = zeros(nsize,1);
 
-nits = 30;
+nits = 200;
 old_nsx = size(a_val,1);
 old_nsy = size(a_val,2);
 [tbav2, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav]=data_loadSIR(year,day + 1,0,res);
@@ -439,14 +439,17 @@ old_nsy = size(a_val,2);
 
 read_start_day = day;
 read_end_day = read_start_day + 4; 
-if ~ismac
-    a_val = ncread(strcat('/home/spencer/Documents/MATLAB/Research/SMAP/images/SMvb-E2T16-', int2str(read_start_day),'-',int2str(read_end_day),'.lis_dump.nc'),'ave_image');
-end
-a_val = zeros(size(a_val));
-anodata_A = 0;
-a_val(a_val == 100) = NaN;
-a_val = reshape(a_val, [nsx, nsy]);
-a_val = reshape(a_val, [old_nsx, old_nsy]);
+% if ~ismac
+    ave = ncread(strcat('/home/spencer/Documents/MATLAB/Research/SMAP/images/SMvb-E2T16-', int2str(read_start_day),'-',int2str(read_end_day),'.lis_dump.nc'),'ave_image');
+% end
+ave(ave == 100) = NaN;
+ave = reshape(ave, [nsx,nsy]);
+ave = flipud(ave');
+% a_val = zeros(size(a_val));
+% anodata_A = 0;
+% a_val(a_val == 100) = NaN;
+% a_val = reshape(a_val, [nsx, nsy]);
+% a_val = reshape(a_val, [old_nsx, old_nsy]);
 
 if sm_space == 1
 %         a_val = reshape(a_val, [nsx, nsy]);
@@ -454,32 +457,107 @@ if sm_space == 1
 %         a_val = flipud(a_val);
 %         a_val(a_val == 0) = NaN;
 %         a_val = reshape(a_val', [old_nsx, old_nsy]);
-        [update_sm, sm_pointer, sm_aresp1, data_idx] = tb2sm_measurements(tbval, pointer, aresp1, year, day, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, 0:.001:0.6);
-        update_sm_mean = nanmean(reshape(update_sm,1,[]))
+        tempav(tempav == 220) = NaN;
+        [data_idx] = find_sm_meas(pointer, res, albav, incav, qualav, clayf, vopav, rghav, tempav, wfracav);
+        good_idx = data_idx;
+        
 
-
-        junk = zeros(size(a_val));
-        for i = 1:length(update_sm)
-            junk(sm_pointer(i).pt(1)) = update_sm(i); 
+        temp = zeros(size(a_val));
+        for j = 1:length(data_idx)
+            temp(pointer(data_idx(j)).pt(1)) = tbval(good_idx(j));
         end
-%       
-        figure(4)
-        junk = reshape(junk, [nsx, nsy]);
-        imagesc(flipud(junk'))
-        drawnow
+        temp = reshape_img(temp,nsx,nsy);
+        figure(1)
+        imagesc(temp(860:1060,6560:6760))
         
-        figure(5)
-        junk = reshape(junk, [nsx, nsy]);
-        junk = flipud(junk');
-        junk(junk > 0.5) = NaN;
-        imagesc(junk)
-        drawnow
+        temp2 = zeros(size(a_val));
+        for j = 1:length(tbval)
+            temp2(pointer(j).pt(1)) = tbval(j);
+        end
+        temp2 = reshape_img(temp2,nsx,nsy);
+        figure(2)
+        imagesc(temp2(860:1060,6560:6760))
         
-        junk_mean = nanmean(reshape(junk,1,[]))
         
-        update_sm = (update_sm * 100);
-        a_val = compute_ave(update_sm, sm_pointer, sm_aresp1, a_val);
+        [sm_meas] = tb2sm_good_meas(tbval(good_idx), pointer(good_idx), aresp1(good_idx), year, day, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, 0.01:0.001:0.6);
+        
+%         profile on
+        [update_sm, sm_pointer, sm_aresp1, footprints] = tb2sm_graph(tbval(good_idx), pointer(good_idx), aresp1(good_idx), year, day, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, sm_meas);
+
+%         [update_sm, sm_pointer, sm_aresp1, footprints] = tb2sm_footprints_v2(tbval(good_idx), pointer(good_idx), aresp1(good_idx), year, day, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
+%         [update_sm, sm_pointer, sm_aresp1, footprints] = tb2sm_footprints_v3(tbval(good_idx), pointer(good_idx), aresp1(good_idx), year, day, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, ave, sm_meas);
+%         profile viewer
+%         pause
+%         save('sm_workspace5.mat','-v7.3');
+%         
+%         load('sm_workspace2.mat','update_sm');
+%         load('sm_workspace2.mat', 'sm_pointer');
+%         load('sm_workspace2.mat','sm_aresp1');
+%         load('sm_workspace2.mat', 'tbval', 'pointer','aresp1')
+
+
+%         load('sm_workspace3.mat','update_sm');
+%         load('sm_workspace3.mat', 'sm_pointer');
+%         load('sm_workspace3.mat','sm_aresp1');
+%         load('sm_workspace3.mat','a_val');
+% 
+%         load('sm_workspace4.mat','update_sm');
+%         load('sm_workspace4.mat', 'sm_pointer');
+%         load('sm_workspace4.mat','sm_aresp1');
+%         load('sm_workspace4.mat','a_val');
+
+%         load('sm_workspace5.mat','update_sm');
+%         load('sm_workspace5.mat', 'sm_pointer');
+%         load('sm_workspace5.mat','sm_aresp1');
+%         load('sm_workspace5.mat','a_val');
+% 
+%         for i = 1:length(sm_aresp1)
+%             sm_aresp1(i).resp = sm_aresp1(i).resp';% ./ nansum(sm_aresp1(i).resp);
+%         end
+        
+%         for i = 1:length(tbval)
+%             aresp1(i).resp = aresp1(i).resp';
+%         end
+        
+%         [update_sm, sm_pointer, sm_aresp1] = tb2sm_measurements_v3(tbval, pointer, aresp1, year, day, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
         update_sm_mean = nanmean(reshape(update_sm,1,[]))
+
+
+%         junk = zeros(size(a_val));
+%         for i = 1:length(update_sm)
+%             junk(sm_pointer(i).pt(1)) = update_sm(i); 
+%         end
+% %       
+%         figure(4)
+%         junk = reshape(junk, [nsx, nsy]);
+%         imagesc(flipud(junk'))
+%         drawnow
+%         
+%         figure(5)
+%         junk = reshape(junk, [nsx, nsy]);
+%         junk = flipud(junk');
+%         junk(junk > 0.5) = NaN;
+%         imagesc(junk)
+%         drawnow
+%         
+%         junk_mean = nanmean(reshape(junk,1,[]))
+%         
+%         update_sm = (update_sm * 100);
+        junk = compute_ave(update_sm, sm_pointer, sm_aresp1, a_val,3);
+        junk2 = compute_ave(tbval(data_idx(1:1000)), pointer(data_idx(1:1000)), aresp1(data_idx(1:1000)), a_val,4);
+        diff = junk - junk2;
+        diff = reshape_img(diff,nsx,nsy);
+        imagesc(diff)
+
+end
+
+if sm_space == 0
+    for i = 1:length(aresp1)
+        aresp1(i).resp = 1 ./ aresp1(i).resp;
+    end
+    junk2 = compute_ave(tbval, pointer, aresp1, a_val);
+    junk3 = 1;
+
 end
 
 sm_start_itr = nits + 1;
@@ -558,6 +636,7 @@ for its = 1:nits
         smav__temp_mean(its) = nanmean(reshape(smav_temp,1,[]))
         temp_mean(its) = nanmean(reshape(temp,1,[]))
         a_val_mean(its) = nanmean(reshape(a_val,1,[]))
+        temp(temp == 0.01) = NaN;
         [mean_err(its), rms_err(its)] = compute_sm_err(smav_temp / 100, temp / 100)
     end
     

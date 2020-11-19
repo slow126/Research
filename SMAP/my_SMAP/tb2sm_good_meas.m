@@ -1,4 +1,4 @@
-function [sm_meas] = tb2sm_measurements(tbav, fill_array, resp_array, year, day, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, possible_mois)
+function [sm_meas] = tb2sm_good_meas(tbav, fill_array, resp_array, year, day, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, possible_mois)
 % year=2016; %Data only downloaded from 2016
 % days=277:285; %Any day or range of days. Data downloaded currently from 1:31, 92:121, 183:213, 275:305
 % res=1; % 1=3km Sentinel/SMAP ancillary, 2=9km SMAP ancillary, 3=36km SMAP ancillary
@@ -16,12 +16,16 @@ disp(['Loaded data for day ' num2str(day)]);
 tbval = tbav;
 
 tb_temp = zeros(1, size(incav,1) * size(incav,2));
+good_pixels = NaN(size(tb_temp));
 meas_len = length(tbav);
 
 
 for i = 1:length(tbav)
     tb_temp(fill_array(i).pt(ceil(end/2))) = tbav(i);
+    good_pixels(fill_array(i).pt(ceil(end/2))) = 1;
 end
+
+good_pixels = reshape_img(good_pixels,size(smav,2),size(smav,1));
 
 tbav = tb_temp;
 tbav = reshape(tbav, fliplr(size(incav)));
@@ -34,62 +38,10 @@ tbav(tbav == 0) = NaN;
 
 
 moisture_map=NaN(size(tbav));
-% if(res==1)
-%     possible_mois = 0.02:.0001:.65;
-%     %         possible_mois = 0.02:.001:.5;
-% else
-%     possible_mois = 0.02:.001:.5;
-% end
+inc = incav .* pi ./ 180;
 
-        inc=incav*pi./180; %read the incidence angle
-        quality=round(qualav); %read the retrieval quality
-        
-        if(res==1)
-            badqual=~(quality ~= 0) .* (quality ~= 16) .* (quality ~= 64) .* (quality ~= 80);
-        else
-            badqual=~(quality ~= 0) .* (quality ~= 8);
-        end
-        
-        good_pixels = ones(size(tbav,1),size(tbav,2));
-        good_pixels = good_pixels .* ~((wfracav > 0) .* wfraccorrect) .* ~isnan(tbav) .* ~isnan(clayf) .* ~isnan(tempav) ...
-                .* ~isnan(albav) .* ~isnan(vopav) .* ~isnan(inc) .* ~isnan(rghav); % .* badqual ;
-%             continue; %skip if we don't have all necessary info, or bad quality
-        good_pixels(good_pixels == 0) = NaN;
-        
-%         figure(1)
-%         imagesc(~(wfracav > 0))
-%         drawnow
-%         
-%         figure(2)
-%         imagesc(~isnan(tbav))
-%         
-%         figure(3)
-%         imagesc(~isnan(clayf))
-%         
-%         figure(4)
-%         imagesc(~isnan(tempav))
-%         
-%         figure(5)
-%         imagesc(~isnan(albav))
-%         
-%         figure(6)
-%         imagesc(~isnan(vopav))
-%         
-%         figure(7)
-%         imagesc(~isnan(inc))
-%         
-%         figure(8)
-%         imagesc(~isnan(rghav))
-%         drawnow
-        
-        
-        
-        
-        %             if(wfraccorrect && wbfrac > 0)
-        %                 salinity=35; % Is there a salinity map?
-        %                 tbwater=tb_water(localtemp,salinity,inc);
-        %                 tb=(tb-tbwater*wbfrac)/(1-wbfrac);
-        %             end
+
+
         
         emis=tbav./tempav; %calculate the rough emissivity
         
@@ -122,8 +74,6 @@ moisture_map=NaN(size(tbav));
         dielec=(sm2dc_parallel(possible_mois,clay_vec(good))); %Use dielectric mixing model
         
             
-    
-        %C = bsxfun(@times,inc_vec(good),dielec');
          poss_emis=1-abs((bsxfun(@times, dielec', cos(inc_vec(good))) - (bsxfun(@minus, dielec', sin(inc_vec(good)) .^ 2)).^0.5)...
              ./(bsxfun(@times, dielec', cos(inc_vec(good))) + (bsxfun(@minus, dielec', sin(inc_vec(good)).^2)).^0.5)).^2;
 
@@ -141,31 +91,8 @@ moisture_map=NaN(size(tbav));
         moisture_map = reshape(moisture_map, 1, length(tb_temp));
         
         
-        sm_meas = zeros(1, nansum(moisture_map ~= 0));
+        sm_meas = moisture_map(find((moisture_map)));
         
-%         for i = 1:meas_len
-%             sm_meas(i) = moisture_map(fill_array(i).pt(1));
-%         end
-        
-%         sm_fill_array = fill_array;
-%         sm_response_array = resp_array;
-        
-%         data_idx = sm_meas;
-%         j = 1;
-%         for i = 1:meas_len
-%             if moisture_map(fill_array(i).pt(1)) ~= 0
-%                 sm_meas(j) = moisture_map(fill_array(i).pt(1));
-%                 data_idx(j) = i;
-%                 j = j+1;
-%             end
-%         end
-% %         
-% %         
-% % 
-%         sm_fill_array = fill_array(data_idx);
-%         sm_response_array = resp_array(data_idx);  
-        
-%         tbval_mean = nanmean(tbval(data_idx))
 
 
         junk = 1;

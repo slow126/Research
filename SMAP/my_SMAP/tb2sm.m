@@ -56,7 +56,7 @@ for picx=1:nsx1
         end
         
         if((wbfrac > 0 && wfraccorrect) || isnan(tb) || isnan(localclay) || isnan(localtemp) ...
-                || isnan(albedo) || isnan(vegop) || isnan(inc) || isnan(roughness) || badqual )
+                || isnan(albedo) || isnan(vegop) || isnan(inc) || isnan(roughness)) % || badqual )
             continue; %skip if we don't have all necessary info, or bad quality
         end
         

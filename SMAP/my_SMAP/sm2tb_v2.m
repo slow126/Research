@@ -1,4 +1,4 @@
-function [tb_map] = sm2tb_parallel(moisture_map, year, day, res, tbav, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav)
+function [tb_map] = sm2tb_v2(moisture_map, year, day, res, tbav, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav)
 % [tbav, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav]=data_loadSIR(year,day,0,res);
 disp(['Loaded data for day ' num2str(day)]);
 
@@ -28,7 +28,7 @@ wfraccorrect=1;
         
         good_pixels = ones(size(tbav,1),size(tbav,2));
         good_pixels = good_pixels .* ~((wfracav > 0) .* wfraccorrect) .* ~isnan(tbav) .* ~isnan(clayf) .* ~isnan(tempav) ...
-                .* ~isnan(albav) .* ~isnan(vopav) .* ~isnan(inc) .* ~isnan(rghav) .* badqual ;
+                .* ~isnan(albav) .* ~isnan(vopav) .* ~isnan(inc) .* ~isnan(rghav);% .* badqual ;
         good_pixels(good_pixels == 0) = NaN;
         
         emis=tbav./tempav; %calculate the rough emissivity
@@ -60,6 +60,8 @@ wfraccorrect=1;
             
         emis=1-abs((bsxfun(@times, dielec, cos(inc_vec(good))) - (bsxfun(@minus, dielec, sin(inc_vec(good)) .^ 2)).^0.5)...
              ./(bsxfun(@times, dielec, cos(inc_vec(good))) + (bsxfun(@minus, dielec, sin(inc_vec(good)).^2)).^0.5)).^2;
+         
+        
             
 
             emis = (emis - 1) ./ exp(h(good).*cos(inc_vec(good)).^2) + 1; % Add surface roughness effects
