@@ -439,9 +439,11 @@ old_nsy = size(a_val,2);
 
 read_start_day = day;
 read_end_day = read_start_day + 4; 
-% if ~ismac
+if ~ismac
     ave = ncread(strcat('/home/spencer/Documents/MATLAB/Research/SMAP/images/SMvb-E2T16-', int2str(read_start_day),'-',int2str(read_end_day),'.lis_dump.nc'),'ave_image');
-% end
+else 
+    ave = ncread('/Users/low/CLionProjects/SMAP/sir/images/SMvb-E2T16-276-280.lis_dump.nc','ave_image');
+end
 ave(ave == 100) = NaN;
 ave = reshape(ave, [nsx,nsy]);
 ave = flipud(ave');
@@ -552,11 +554,11 @@ if sm_space == 1
 end
 
 if sm_space == 0
-    for i = 1:length(aresp1)
-        aresp1(i).resp = 1 ./ aresp1(i).resp;
-    end
-    junk2 = compute_ave(tbval, pointer, aresp1, a_val);
-    junk3 = 1;
+%     for i = 1:length(aresp1)
+%         aresp1(i).resp = 1 ./ aresp1(i).resp;
+%     end
+%     junk2 = compute_ave(tbval, pointer, aresp1, a_val);
+%     junk3 = 1;
 
 end
 
