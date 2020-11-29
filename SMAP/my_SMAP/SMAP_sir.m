@@ -13,7 +13,7 @@ fprintf("BYU SSM/I meta SIR/SIRF program: C version %f\n",VERSION);
 preloaded = 0
 save_workspace = 0
 res = 1;
-sm_space = 0
+sm_space = 1
 
 if (~exist('setup_in', 'var') | ~exist('outpath', 'var') | ~exist('storage_option', 'var'))
     fprintf("\nusage: %s setup_in outpath storage_option\n\n",setup_in);
