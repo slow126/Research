@@ -60,6 +60,7 @@ for i=1:length(scale)
     sx(fill_array(i).pt) = (sx(fill_array(i).pt) .* (tot(fill_array(i).pt) - response_array(i).resp) + response_array(i).resp .* ang(i)) ./ tot(fill_array(i).pt);
     sx2(fill_array(i).pt) = (sx2(fill_array(i).pt) .* (tot(fill_array(i).pt) - response_array(i).resp) + response_array(i).resp .* (ang(i).^2)) ./ tot(fill_array(i).pt);
     
+    
 %     temp4 = a_val;
 %     temp4(a_temp > 0) = a_temp(a_temp > 0);
 %     temp3 = reshape(temp4, [11568, 4872]);
