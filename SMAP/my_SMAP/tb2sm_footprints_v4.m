@@ -40,8 +40,16 @@ for i = 1:length(data)
         
         sm_meas(i) = possible_mois(dif_ind);
         
+        
+        shift = 21;
+        tb_footprint = data(i).tb_meas .* (data(i).resp / nanmean(data(i).resp));
+        old_range = nanmax(tb_footprint(:)) - nanmin(tb_footprint(:));
+        new_range = nanmax(tb_footprint(:)) - shift - (nanmin(tb_footprint(:)) + shift);
+        
+        
+        tb_compress = (tb_footprint - nanmin(tb_footprint(:))) * new_range / old_range + nanmin(tb_footprint(:) + shift);
 
-        emis=data(i).tb_meas .* (data(i).resp / nanmean(data(i).resp)) * (.75 * max(data(i).resp) - .25 * min(data(i).resp))./data(i).tempav; %calculate the rough emissivity
+        emis= tb_compress ./data(i).tempav; %calculate the rough emissivity
         
         % Vegetation and roughness correction
         h=data(i).rghav;
@@ -92,8 +100,17 @@ for i = 1:length(data)
 %         
 % 
 %             total2 = ones(11568,4872) * -1;
-%                     figure(10)
+%             figure(10)
 %             total2(data(i).pt) = data(i).sm_resp;
+%             temp = reshape(total2, [11568,4872]);
+%             temp = flipud(temp');
+%             imagesc(temp(300:338, 8460:8560))
+% %             imagesc(temp)
+%             drawnow
+%             
+%             total2 = ones(11568,4872) * -1;
+%             figure(11)
+%             total2(data(i).pt) = emis;
 %             temp = reshape(total2, [11568,4872]);
 %             temp = flipud(temp');
 %             imagesc(temp(300:338, 8460:8560))

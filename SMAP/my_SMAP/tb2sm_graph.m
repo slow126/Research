@@ -215,33 +215,33 @@ for i = 1:1000 %length(tbav)
         
         sm_fill_array(m).pt = (fill_array(i).pt(mask));
 %         sm_meas(i)
-        footprint = footprint ./ (1 + sm_meas(i));
+        footprint = footprint ./ (100 + sm_meas(i));
         footprint = footprint;
         sm_response_array(m).resp = footprint';
         sm_footprint(m).print = footprint';
         sm_meas2(m) = sm_meas(i);
         
         
-                total2 = ones(size(total)) * -1;
-                total3 = ones(size(total)) * -1;
-                if length(sm_response_array(m).resp) > 140
-        
-                    figure(10)
-                    total2(sm_fill_array(m).pt) = sm_response_array(m).resp;
-                    temp = reshape(total2, [11568,4872]);
-                    temp = flipud(temp');
-                    imagesc(temp(310:338, 8480:8520))
-%                     imagesc(temp)
-                    drawnow
-        
-                    figure(11)
-                    total3(fill_array(m).pt) = resp_array(m).resp;
-                    temp = reshape(total3, [11568,4872]);
-                    temp = flipud(temp');
-                    imagesc(temp(310:338, 8480:8520))
-%                     imagesc(temp)
-                    drawnow
-                end
+%                 total2 = ones(size(total)) * -1;
+%                 total3 = ones(size(total)) * -1;
+%                 if length(sm_response_array(m).resp) > 140
+%         
+%                     figure(10)
+%                     total2(sm_fill_array(m).pt) = sm_response_array(m).resp;
+%                     temp = reshape(total2, [11568,4872]);
+%                     temp = flipud(temp');
+%                     imagesc(temp(310:338, 8480:8520))
+% %                     imagesc(temp)
+%                     drawnow
+%         
+%                     figure(11)
+%                     total3(fill_array(m).pt) = resp_array(m).resp;
+%                     temp = reshape(total3, [11568,4872]);
+%                     temp = flipud(temp');
+%                     imagesc(temp(310:338, 8480:8520))
+% %                     imagesc(temp)
+%                     drawnow
+%                 end
 %         
 %                     figure(12)
 % %                     total3(fill_array(m).pt) = normalize(resp_array(m).resp,'range') * tbav(i) ;

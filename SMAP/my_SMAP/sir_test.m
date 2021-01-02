@@ -14,7 +14,7 @@ preloaded = 1
 save_workspace = 0
 res = 1;
 sm_space = 1
-load_data = 1
+load_data = 0
 
 if (~exist('setup_in', 'var') | ~exist('outpath', 'var') | ~exist('storage_option', 'var'))
     fprintf("\nusage: %s setup_in outpath storage_option\n\n",setup_in);
@@ -409,7 +409,7 @@ else
 %     load('/Users/low/Documents/MATLAB/SMAP/my_SMAP/smap_work.mat');
 %     load('/Users/low/Documents/MATLAB/SMAP/my_SMAP/pointer.mat');
 %     load('/Users/low/Documents/MATLAB/SMAP/my_SMAP/aresp1.mat');
-    load('smap_work.mat','nsize','count','ang');
+    load('smap_work.mat','nsize','count','ang','tbval','pointer','aresp1');
 end
 
 
