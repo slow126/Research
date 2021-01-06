@@ -7,6 +7,7 @@ wfraccorrect=1; % Correct for water body fractions - for now this means ignoring
 
 
 possible_mois = 0.01:0.0001:0.5;
+sm_meas = zeros(length(data),1);
 
 
 for i = 1:length(data)
@@ -41,15 +42,24 @@ for i = 1:length(data)
         sm_meas(i) = possible_mois(dif_ind);
         
         
-        shift = 21;
-        tb_footprint = data(i).tb_meas .* (data(i).resp / nanmean(data(i).resp));
-        old_range = nanmax(tb_footprint(:)) - nanmin(tb_footprint(:));
-        new_range = nanmax(tb_footprint(:)) - shift - (nanmin(tb_footprint(:)) + shift);
-        
-        
-        tb_compress = (tb_footprint - nanmin(tb_footprint(:))) * new_range / old_range + nanmin(tb_footprint(:) + shift);
+%         new_max = 1.1 * data(i).tb_meas;
+%         new_min = .9 * data(i).tb_meas;
+%         tb_footprint = data(i).tb_meas .* (data(i).resp / nanmean(data(i).resp));
+%         old_range = nanmax(tb_footprint(:)) - nanmin(tb_footprint(:));
+%         new_range = new_max - new_min;
+% %         new_range = nanmax(tb_footprint(:)) - shift - (nanmin(tb_footprint(:)) + shift);
+%          
+%         
+%         tb_compress = (tb_footprint - nanmin(tb_footprint(:))) * new_range / old_range + (new_min);
 
-        emis= tb_compress ./data(i).tempav; %calculate the rough emissivity
+        tb_resp = data(i).resp;
+        tb_resp_mean = nanmean(tb_resp(:));
+        tb_footprint = .2 * (tb_resp - tb_resp_mean);
+        tb_footprint = tb_footprint + tb_resp_mean;
+        
+        tb_compress = data(i).tb_meas .* tb_footprint ./ nanmean(tb_footprint(:));
+
+        emis= tb_compress ./ data(i).tempav; %calculate the rough emissivity
         
         % Vegetation and roughness correction
         h=data(i).rghav;
@@ -84,8 +94,13 @@ for i = 1:length(data)
         footprint = possible_mois(dif_ind)';
         data(i).sm = footprint';
         
-
-        data(i).sm_resp = footprint / (sm_meas(i));
+        sm_prf = (footprint) / (sm_meas(i));
+        
+        sm_prf = (sm_prf - nanmin(sm_prf(:))) / (nanmax(sm_prf(:)) - nanmin(sm_prf(:)));
+        
+        data(i).sm_resp = 1 ./ (sm_prf + 0.0001);
+        
+        
 
         
 %         sm_meas(m) = nanmean(footprint);
@@ -101,7 +116,7 @@ for i = 1:length(data)
 % 
 %             total2 = ones(11568,4872) * -1;
 %             figure(10)
-%             total2(data(i).pt) = data(i).sm_resp;
+%             total2(data(i).pt) = footprint; %data(i).sm_resp;
 %             temp = reshape(total2, [11568,4872]);
 %             temp = flipud(temp');
 %             imagesc(temp(300:338, 8460:8560))
@@ -110,7 +125,7 @@ for i = 1:length(data)
 %             
 %             total2 = ones(11568,4872) * -1;
 %             figure(11)
-%             total2(data(i).pt) = emis;
+%             total2(data(i).pt) = tb_compress;
 %             temp = reshape(total2, [11568,4872]);
 %             temp = flipud(temp');
 %             imagesc(temp(300:338, 8460:8560))
