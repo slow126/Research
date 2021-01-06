@@ -6,7 +6,7 @@ function [data, sm_meas] = tb2sm_footprints_v4(data)
 wfraccorrect=1; % Correct for water body fractions - for now this means ignoring pixels with any water
 
 
-possible_mois = 0.01:0.0001:0.5;
+possible_mois = 0.02:0.0001:0.6;
 sm_meas = zeros(length(data),1);
 
 
@@ -98,7 +98,7 @@ for i = 1:length(data)
         
         sm_prf = (sm_prf - nanmin(sm_prf(:))) / (nanmax(sm_prf(:)) - nanmin(sm_prf(:)));
         
-        data(i).sm_resp = 1 ./ (sm_prf + 0.0001);
+        data(i).sm_resp = 1 ./ (sm_prf);
         
         
 
@@ -116,7 +116,7 @@ for i = 1:length(data)
 % 
 %             total2 = ones(11568,4872) * -1;
 %             figure(10)
-%             total2(data(i).pt) = footprint; %data(i).sm_resp;
+%             total2(data(i).pt) = data(i).sm_resp;
 %             temp = reshape(total2, [11568,4872]);
 %             temp = flipud(temp');
 %             imagesc(temp(300:338, 8460:8560))

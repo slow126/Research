@@ -469,8 +469,8 @@ if sm_space == 1
         end
         
         [data,sm_meas] = tb2sm_footprints_v4(data);
-        save('data.mat','data')
-        save('sm_meas.mat','sm_meas')
+        save('data_inf.mat','data')
+        save('sm_meas_inf.mat','sm_meas')
         
         
 %         tempav(tempav == 220) = NaN;
@@ -608,7 +608,7 @@ for its = 1:nits
     if sm_space == 1
 %        update_sm = tb2sm_measurements(tbval, pointer, aresp1, year, day, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, 0:.001:1);
 %        update_sm = update_sm;
-        [a_val, a_temp, tot, sx, sx2, total] = get_updates(sm_meas', ang, count, sm_pointer, sm_resp, a_val, sx, sx2, a_temp, tot, nsx, nsy);
+        [a_val, a_temp, tot, sx, sx2, total] = get_updates(sm_meas, ang, count, sm_pointer, sm_resp, a_val, sx, sx2, a_temp, tot, nsx, nsy);
         a_temp(a_temp > 0.5) = 0.5;
         a_val(a_temp > 0) = a_temp(a_temp>0);
     else

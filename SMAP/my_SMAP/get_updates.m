@@ -47,13 +47,6 @@ for i=1:length(scale)
         update(i).upd =  0.5 * ave(i) * (1.0 - scale(i)) + (a_val(fill_array(i).pt)) * scale(i);
     end
     
-    if(sum(fill_array(i).pt == 44619161) > 1)
-        junk = 1;
-    elseif(sum(fill_array(i).pt == 44410983) > 1)
-        junk = 1;
-    end
-    
-    
     tot(fill_array(i).pt) = tot(fill_array(i).pt) + response_array(i).resp;
     test = (a_temp(fill_array(i).pt) .* (tot(fill_array(i).pt) - response_array(i).resp) + update(i).upd .* response_array(i).resp) ./ tot(fill_array(i).pt);
     a_temp(fill_array(i).pt) = test;
