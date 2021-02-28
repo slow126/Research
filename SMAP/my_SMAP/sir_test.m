@@ -14,7 +14,7 @@ preloaded = 1
 save_workspace = 0
 res = 1;
 sm_space = 1
-load_data = 0
+load_data = 1
 
 if (~exist('setup_in', 'var') | ~exist('outpath', 'var') | ~exist('storage_option', 'var'))
     fprintf("\nusage: %s setup_in outpath storage_option\n\n",setup_in);
@@ -444,22 +444,29 @@ read_end_day = read_start_day + 4;
 if ~ismac
     ave = ncread(strcat('/home/spencer/Documents/MATLAB/Research/SMAP/images/SMvb-E2T16-', int2str(read_start_day),'-',int2str(read_end_day),'.lis_dump.nc'),'ave_image');
 else 
-    ave = ncread('/Users/low/CLionProjects/SMAP/sir/images/SMvb-E2T16-276-280.lis_dump.nc','ave_image');
+    ave = ncread(strcat('/Users/low/CLionProjects/SMAP/sir/images/SMvb-E2T16-',int2str(read_start_day),'-',int2str(read_end_day),'.lis_dump.nc'),'ave_image');
 end
 ave(ave == 100) = NaN;
 ave = reshape(ave, [nsx,nsy]);
 ave = flipud(ave');
-% a_val = zeros(size(a_val));
-% anodata_A = 0;
-% a_val(a_val == 100) = NaN;
-% a_val = reshape(a_val, [nsx, nsy]);
-% a_val = reshape(a_val, [old_nsx, old_nsy]);
+
+
+% [moisture_map] = tb2sm(ave, year, day, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
+% 
+% figure(20)
+% imagesc(moisture_map)
+% colorbar
+% 
+% moisture_map = reshape_img(moisture_map,1,[]);
 
 if sm_space == 1
 
     if load_data == 1
-        load 'data.mat'
-        load 'sm_meas.mat'
+%         load 'data.mat'
+%         load 'sm_meas.mat'
+        
+        load(strcat('data-',int2str(day),'-zero_mean.mat'))
+        load(strcat('sm_meas-',int2str(day),'-zero_mean.mat'))
     else
         data = get_goodData(tbval, pointer, aresp1, ave, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav);
         
@@ -468,9 +475,22 @@ if sm_space == 1
             idx(j) = data(j).idx;
         end
         
+
+        
+        
         [data,sm_meas] = tb2sm_footprints_v4(data);
-        save('data_inf.mat','data')
-        save('sm_meas_inf.mat','sm_meas')
+        
+
+
+        
+%         for i = 1:length(data)
+% 
+%             data(i).sm_resp = (data(i).sm_meas ./ moisture_map(data(i).pt))';
+%             data(i).sm_resp = data(i).sm_resp - nanmean(data(i).sm_resp);
+%         end
+        
+        save(strcat('data-',int2str(day),'-zero_mean2.mat'),'data','-v7.3')
+        save(strcat('sm_meas-',int2str(day),'-zero_mean2.mat'),'sm_meas','-v7.3')
         
         
 %         tempav(tempav == 220) = NaN;
@@ -560,6 +580,9 @@ if sm_space == 1
 %         update_sm = (update_sm * 100);
     end
         a_val = compute_ave_v2(sm_meas, data, a_val,4);
+%         a_val(a_val < -0.6) = NaN;
+%         a_val(a_val > 0.6) = NaN;
+%         a_val = a_val + 0.6;
         figure(4)
         title('AVE image')
 %         junk2 = compute_ave(tbval(data_idx(1:1000)), pointer(data_idx(1:1000)), aresp1(data_idx(1:1000)), a_val,4);
@@ -569,29 +592,52 @@ if sm_space == 1
 
 end
 
-if sm_space == 0
-%     for i = 1:length(aresp1)
-%         aresp1(i).resp = 1 ./ aresp1(i).resp;
-%     end
-%     junk2 = compute_ave(tbval, pointer, aresp1, a_val);
-%     junk3 = 1;
 
-end
+% tb_meas_img = zeros(size(a_val));
+% sm_meas_img = zeros(size(a_val));
+% 
+% for i = 1:length(tbval)
+%     tb_meas_img(pointer(i).pt(1)) = tbval(i);
+% end
+% 
+% for i = 1:length(sm_meas)
+%     sm_meas_img(sm_pointer(i).pt(1)) = sm_meas(i);
+% end
+% 
+% sm_meas_img = reshape_img(sm_meas_img, 11568, 4872);
+% tb_meas_img = reshape_img(tb_meas_img, 11568, 4872);
+
+
+% total2 = ones(11568,4872) * NaN;
+% figure(11)
+% total2(data(1).pt) = data(1).sm_resp;
+% temp = reshape(total2, [11568,4872]);
+% temp = flipud(temp');
+% my_mesh = temp(320:327, 8473:8491) / nanmax(temp(:));
+% %             surf(my_mesh)
+% imagesc(my_mesh)
+% %             imagesc(temp)
+% daspect([1 1 .025])
+% drawnow
+
 
 sm_start_itr = nits + 1;
-% a_val = ones(size(a_val)) * .01;
-% a_val(~isnan(a_val)) = 0.01;
+a_val = a_val - nanmin(a_val(:));
+if sm_space == 1
+    for i = length(data):-1:1
+%         data(i).sm_resp =(data(i).sm_resp - min(data(i).sm_resp));
+%         data(i).sm_resp = exp(data(i).sm_resp);
+        sm_resp(i).resp = (data(i).resp);% - nanmin(data(i).sm_resp);
+        sm_pointer(i).pt = data(i).pt;
 
-% a_val = a_val .* 100 + 10;
+    end
+end
+
 poss_mois = 0.0001:.001:0.5;
 
 
 err = zeros(1,nits);
 
-for i = length(data):-1:1
-    sm_resp(i).resp = data(i).sm_resp;
-    sm_pointer(i).pt = data(i).pt;
-end
 
 for its = 1:nits
     a_temp = zeros(nsize,1);
@@ -609,7 +655,7 @@ for its = 1:nits
 %        update_sm = tb2sm_measurements(tbval, pointer, aresp1, year, day, res, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav, 0:.001:1);
 %        update_sm = update_sm;
         [a_val, a_temp, tot, sx, sx2, total] = get_updates(sm_meas, ang, count, sm_pointer, sm_resp, a_val, sx, sx2, a_temp, tot, nsx, nsy);
-        a_temp(a_temp > 0.5) = 0.5;
+%         a_temp(a_temp > 0.5) = 0.5;
         a_val(a_temp > 0) = a_temp(a_temp>0);
     else
         [a_val, a_temp, tot, sx, sx2, total] = get_updates(tbval', ang, count, pointer, aresp1, a_val, sx, sx2, a_temp, tot, nsx, nsy);
@@ -655,9 +701,8 @@ for its = 1:nits
 %         temp(temp > 50) = NaN;
         smav_temp = smav;
         smav_mean(its) = nanmean(reshape(smav_temp,1,[]))
-        smav_temp(smav_temp > 0.5) = NaN;
+%         smav_temp(smav_temp > 0.5) = NaN;
         smav_temp(smav_temp == 0) = NaN;
-        smav_temp = smav_temp;
         smav_temp_mean(its) = nanmean(reshape(smav_temp,1,[]))
         temp_mean(its) = nanmean(reshape(temp,1,[]))
         a_val_mean(its) = nanmean(reshape(a_val,1,[]))

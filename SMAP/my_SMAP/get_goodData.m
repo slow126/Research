@@ -53,6 +53,9 @@ good_pixels(good_pixels == 0) = NaN;
             data(k).sm = zeros(size(pointer(i).pt(mask)));
             data(k).idx = i;
             data(k).sm_resp = zeros(size(pointer(i).pt(mask)));
+            data(k).sm_meas = 0;
+            data(k).temp_resp = aresp1(i).resp;
+            data(k).temp_pt = pointer(i).pt;
             k = k + 1;
         end
     end

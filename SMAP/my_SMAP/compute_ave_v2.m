@@ -9,8 +9,8 @@ function [ave] = compute_ave_v2(pow, data, a_val,fig)
     resp_total = zeros(size(a_val));
     for i = 1:length(pow)
 %         data(i).sm_resp = data(i).sm_resp;
-        total(data(i).pt) = total(data(i).pt) + pow(i) .* data(i).sm_resp;
-        resp_total(data(i).pt) = resp_total(data(i).pt) + data(i).sm_resp;
+        total(data(i).pt) = total(data(i).pt) + pow(i) .* (data(i).sm_resp);
+        resp_total(data(i).pt) = resp_total(data(i).pt) + abs(data(i).sm_resp);
         ave(data(i).pt) = nansum(pow(i) .* data(i).sm_resp) ./ nansum(data(i).sm_resp);
        
 %     total2 = ones(size(total)) * -1;
@@ -33,13 +33,19 @@ function [ave] = compute_ave_v2(pow, data, a_val,fig)
 %     imagesc(temp(900:1400,8150:8350))
 %     drawnow
     end
-    ave = total ./ resp_total;
+    ave = (total) ./ ((resp_total));
     
     figure(fig)
     temp = reshape(ave, [11568,4872]);
-    temp(isnan(temp)) = NaN;
+%     temp(temp == 0) = NaN;
     temp = flipud(temp');
 %     imagesc(temp(900:1400,8150:8350))
+%     temp(temp > 0.6) = 0.6;
+%     temp(temp < 0) = 0;
+%     temp(isnan(temp)) = -1;
+%     temp = (temp - nanmin(temp(:))) ./ (nanmax(temp(:)) - nanmin(temp(:))) * 0.6 + 0.02;
+%     temp(temp < 0) = NaN;
+%     imagesc((temp(3274:3580, 3715:4000)))
     imagesc(temp)
     drawnow
 

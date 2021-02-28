@@ -11,9 +11,9 @@ totalsumsq=0;
 totalsum=0;
 totalmeas=0;
 
-load 'poss_emis.mat';
-poss_emis_par = poss_emis;
-clear poss_emis;
+% load 'poss_emis.mat';
+% poss_emis_par = poss_emis;
+% clear poss_emis;
 
 % load 'dielec.mat'
 % dielec_par = dielec;

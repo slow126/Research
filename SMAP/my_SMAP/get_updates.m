@@ -27,7 +27,7 @@ for i = 1:length(fill_array)
 
 end
 
-ave = total ./ num;
+ave = total ./ (num);
 update_idx = ones(size(ave,1), size(ave,2));
 update_idx(ave == 0) = 0;
 
@@ -46,6 +46,9 @@ for i=1:length(scale)
     else
         update(i).upd =  0.5 * ave(i) * (1.0 - scale(i)) + (a_val(fill_array(i).pt)) * scale(i);
     end
+    
+    update(i).upd(update(i).upd <= 0) = 0.001;
+    update(i).upd(update(i).upd > 0.6) = 0.06;
     
     tot(fill_array(i).pt) = tot(fill_array(i).pt) + response_array(i).resp;
     test = (a_temp(fill_array(i).pt) .* (tot(fill_array(i).pt) - response_array(i).resp) + update(i).upd .* response_array(i).resp) ./ tot(fill_array(i).pt);

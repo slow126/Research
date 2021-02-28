@@ -36,11 +36,14 @@ for i = 1:length(data)
              ./(bsxfun(@times, dielec', cos(data(i).inc(data(i).tb_meas_loc))') + (bsxfun(@minus, dielec', sin(data(i).inc(data(i).tb_meas_loc))'.^2)).^0.5)).^2;
 
         
-        [min_err, dif_ind] = min(abs(bsxfun(@minus, poss_emis, real(emis'))));
+        [min_err, dif_ind] = nanmin(abs(bsxfun(@minus, poss_emis, real(emis'))));
         real_emis = real(emis');
         
         sm_meas(i) = possible_mois(dif_ind);
-        
+%         data(i).sm_meas = sm_meas(i);
+%         data(i).sm_resp = (data(i).resp - nanmin(data(i).resp)) / (nanmax(data(i).resp) - nanmin(data(i).resp));
+%         data(i).sm_resp = data(i).sm_resp - nanmean(data(i).sm_resp);
+%         continue
         
 %         new_max = 1.1 * data(i).tb_meas;
 %         new_min = .9 * data(i).tb_meas;
@@ -53,9 +56,10 @@ for i = 1:length(data)
 %         tb_compress = (tb_footprint - nanmin(tb_footprint(:))) * new_range / old_range + (new_min);
 
         tb_resp = data(i).resp;
-        tb_resp_mean = nanmean(tb_resp(:));
-        tb_footprint = .2 * (tb_resp - tb_resp_mean);
-        tb_footprint = tb_footprint + tb_resp_mean;
+        tb_resp_max = nanmax(tb_resp(:));
+        tb_footprint = tb_resp;
+%         tb_footprint = (tb_resp / 1000);
+        tb_footprint = 0.1 * (tb_footprint - nanmean(tb_footprint(:))) + nanmean(tb_footprint(:));
         
         tb_compress = data(i).tb_meas .* tb_footprint ./ nanmean(tb_footprint(:));
 
@@ -85,7 +89,7 @@ for i = 1:length(data)
              ./(bsxfun(@times, dielec', cos(data(i).inc)') + (bsxfun(@minus, dielec', sin(data(i).inc)'.^2)).^0.5)).^2;
 
         
-        [min_err, dif_ind] = min(abs(bsxfun(@minus, poss_emis, real(emis'))));
+        [min_err, dif_ind] = nanmin(abs(bsxfun(@minus, poss_emis, real(emis'))));
         real_emis = real(emis');
         
         
@@ -96,25 +100,26 @@ for i = 1:length(data)
         
         sm_prf = (footprint) / (sm_meas(i));
         
-        sm_prf = (sm_prf - nanmin(sm_prf(:))) / (nanmax(sm_prf(:)) - nanmin(sm_prf(:)));
-        
-        data(i).sm_resp = 1 ./ (sm_prf);
-        
-        
+%         sm_prf = (sm_prf - nanmin(sm_prf(:))) / (nanmax(sm_prf(:)) - nanmin(sm_prf(:)));
+
+%        dielec=(sm2dc_v2(sm_prf,data(i).clayf)); %Use dielectric mixing model
+%             
+%         emis=1-abs((bsxfun(@times, dielec, cos(data(i).inc)) - (bsxfun(@minus, dielec, sin(data(i).inc) .^ 2)).^0.5)...
+%              ./(bsxfun(@times, dielec, cos(data(i).inc)) + (bsxfun(@minus, dielec, sin(data(i).inc).^2)).^0.5)).^2;
+%          
+%         
+%             
+% 
+%         emis = (emis - 1) ./ exp(h.*cos(data(i).inc).^2) + 1; % Add surface roughness effects
+%         emis = emis .* (cantrans.^2 + data(i).albav .* cantrans - data(i).albav.*cantrans.^2) + 1 - cantrans.^2 - data(i).albav + data(i).albav .* cantrans.^2; %Add vegetation effects
+%         sm_prf2 = emis .* data(i).tempav;
 
         
-%         sm_meas(m) = nanmean(footprint);
-%         sm_fill_array(m).pt = (data(i).pt)';
-%         footprint = footprint ./ nanmean(footprint);
-% %         footprint = footprint(mask) ./ sm_meas(i);
-%         sm_response_array(m).resp = footprint;
-%         sm_footprint(m).print = footprint;
-% %         foot = NaN(1,4872 * 11568);
-% %         foot(fill_array(i).pt(mask)) = footprint;
-%         
-%         
-% 
-%             total2 = ones(11568,4872) * -1;
+        data(i).sm_resp = (sm_prf - nanmean(sm_prf(:))); %100 * (sm_prf - nanmean(sm_prf(:))) + nanmean(sm_prf(:)); %((1 ./ (sm_prf + 0.00001)));
+%         data(i).sm_resp = data(i).sm_resp + nanmin(data(i).sm_resp(:));
+        data(i).sm_meas = sm_meas(i);
+            
+%             total2 = ones(11568,4872) * NaN;
 %             figure(10)
 %             total2(data(i).pt) = data(i).sm_resp;
 %             temp = reshape(total2, [11568,4872]);
@@ -123,50 +128,52 @@ for i = 1:length(data)
 % %             imagesc(temp)
 %             drawnow
 %             
-%             total2 = ones(11568,4872) * -1;
+%             total2 = ones(11568,4872) * NaN;
 %             figure(11)
+%             total2(data(i).temp_pt) = data(i).temp_resp;
+%             temp = reshape(total2, [11568,4872]);
+%             temp = flipud(temp');
+%             my_mesh = temp(315:327, 8463:8500) / nanmax(temp(:));
+%             surf(my_mesh)
+% %             imagesc(my_mesh)
+%             
+%             set(gca,'XTick',[1:8500-8463+1]);
+%             xticklabels({3*[-19:18]})
+%             set(gca,'YTick',[1:327-315+1]);
+%             yticklabels({3*[-6:8]})
+%             xlabel('Distance in Kilometers from center of Response', 'FontSize',18)
+%             ylabel('Distance in Kilometers from center of Response', 'FontSize', 18)
+% %             imagesc(temp)
+% %             daspect([1 1 .025])
+%             colorbar
+%             drawnow
+%             
+%             total2 = ones(11568,4872) * NaN;
+%             figure(12)
 %             total2(data(i).pt) = tb_compress;
 %             temp = reshape(total2, [11568,4872]);
 %             temp = flipud(temp');
 %             imagesc(temp(300:338, 8460:8560))
 % %             imagesc(temp)
 %             drawnow
-        
-%         if length(sm_response_array(m).resp) > 140
 %             
-%             figure(10)
+%             total2 = ones(11568,4872) * NaN;
+%             figure(13)
 %             total2(data(i).pt) = footprint;
 %             temp = reshape(total2, [11568,4872]);
 %             temp = flipud(temp');
 %             imagesc(temp(300:338, 8460:8560))
 % %             imagesc(temp)
 %             drawnow
-            
-%             figure(11)
-%             total3(fill_array(m).pt) = resp_array(m).resp;
-%             temp = reshape(total3, [11568,4872]);
-%             temp = flipud(temp');
-%             imagesc(temp(300:338, 8460:8560))
-% %             imagesc(temp)
-%             drawnow
 %             
-%             figure(12)
-%             total3(fill_array(m).pt) = resp_array(m).resp * tbav(i) / nanmean(resp_array(m).resp);
-%             temp = reshape(total3, [11568,4872]);
-%             temp = flipud(temp');
-%             imagesc(temp(300:338, 8460:8560))
-% %             imagesc(temp)
-%             drawnow
-%             
-%             figure(13)
-%             total2(sm_fill_array(m).pt) = sm_response_array(m).resp .* sm_meas(m);
+%             total2 = ones(11568,4872) * NaN;
+%             figure(14)
+%             total2(data(i).pt) = sm_prf;
 %             temp = reshape(total2, [11568,4872]);
 %             temp = flipud(temp');
 %             imagesc(temp(300:338, 8460:8560))
 % %             imagesc(temp)
 %             drawnow
-%         end
-%          m = m + 1;
+        
 
-%     end
 end

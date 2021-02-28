@@ -15,7 +15,7 @@ function [mean_err, rmse] = compute_sm_err(img1, img2)
     drawnow
     
     figure(2)
-    imagesc(img2)
+    imagesc(img2(3274:3580, 3715:4000))
     colorbar
     drawnow
     
