@@ -37,6 +37,7 @@ function [ave] = compute_ave(pow, fill_array, response_array, a_val,fig)
     temp(isnan(temp)) = -1;
     temp = flipud(temp');
     imagesc(temp(900:1400,8150:8350))
+%     imagesc(abs(temp))
     drawnow
 
 end

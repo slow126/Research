@@ -608,30 +608,54 @@ end
 % tb_meas_img = reshape_img(tb_meas_img, 11568, 4872);
 
 
-% total2 = ones(11568,4872) * NaN;
-% figure(11)
-% total2(data(1).pt) = data(1).sm_resp;
-% temp = reshape(total2, [11568,4872]);
-% temp = flipud(temp');
-% my_mesh = temp(320:327, 8473:8491) / nanmax(temp(:));
-% %             surf(my_mesh)
-% imagesc(my_mesh)
-% %             imagesc(temp)
+total2 = ones(11568,4872) * NaN;
+figure(11)
+total2(data(1).pt) = data(1).sm_resp;
+temp = reshape(total2, [11568,4872]);
+temp = flipud(temp');
+my_mesh = temp(320:327, 8473:8491);% / nanmax(temp(:));
+%             surf(abs(my_mesh))
+imagesc(my_mesh)
+%             imagesc(temp)
 % daspect([1 1 .025])
-% drawnow
+yticks([1:7])
+yticklabels([-3:3] * 3)
+ylabel('Distance from center of SMRF in KM', 'FontSize',20)
+xlabel('Distance from center of SMRF in KM', 'FontSize',20)
+xticks([1:2:20])
+xticklabels([-9:2:11]*3)
+drawnow
 
-
+data2 = data;
 sm_start_itr = nits + 1;
-a_val = a_val - nanmin(a_val(:));
+% a_val = a_val - nanmin(a_val(:));
 if sm_space == 1
     for i = length(data):-1:1
-%         data(i).sm_resp =(data(i).sm_resp - min(data(i).sm_resp));
+%         data(i).sm_resp(data(i).sm_resp > 0) = 0;
+%         data(i).sm_resp = data(i).sm_resp * -1;
+
+%         data(i).sm_resp(data(i).sm_resp < 0) = abs(data(i).sm_resp(data(i).sm_resp < 0).^.5 );
+%         data(i).sm_resp = data(i).sm_resp * -1;
+
+%         data(i).sm_resp(data(i).sm_resp < -0.1) = -1 * 1./data(i).sm_resp(data(i).sm_resp < -0.1);% * -10000;
+%         data(i).sm_resp(data(i).sm_resp > -0.1) = abs(data(i).sm_resp(data(i).sm_resp > -0.1));
+        data(i).sm_resp = 1./abs(data(i).sm_resp);
+
+%         data(i).sm_resp = abs(data(i).sm_resp);
+
 %         data(i).sm_resp = exp(data(i).sm_resp);
-        sm_resp(i).resp = (data(i).resp);% - nanmin(data(i).sm_resp);
+%         sm_resp(i).resp = (atan(data(i).sm_resp - nanmin(data(i).sm_resp)));
+%         data(i).pt = data(i).pt(data(i).sm_resp > 0);
+%         data(i).sm_resp = (data(i).sm_resp(data(i).sm_resp > 0));
+        
         sm_pointer(i).pt = data(i).pt;
+        sm_resp(i).resp = abs(data(i).sm_resp);
+                
 
     end
 end
+
+a_val = compute_ave_v2(sm_meas, data, a_val,4);
 
 poss_mois = 0.0001:.001:0.5;
 

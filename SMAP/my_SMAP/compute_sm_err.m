@@ -10,20 +10,24 @@ function [mean_err, rmse] = compute_sm_err(img1, img2)
     totalmeas=0;
     
     figure(1)
+%     imagesc(img1(3274:3580, 3715:4000))
     imagesc(img1)
     colorbar
     drawnow
+    axis off
     
     figure(2)
-    imagesc(img2(3274:3580, 3715:4000))
+    imagesc(img2)
+%     imagesc(img2(3274:3580, 3715:4000))
     colorbar
     drawnow
-    
+    axis off
     
     figure(3)
     imagesc(img1 - img2)
     colorbar
     drawnow
+    axis off
     
 %     img1_mean = nanmean(nanmean(img1))
 %     img2_mean = nanmean(nanmean(img2))

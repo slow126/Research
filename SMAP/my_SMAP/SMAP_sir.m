@@ -10,10 +10,10 @@ anodata_V=-1.0;
 anodata_E=-15.0;
 
 fprintf("BYU SSM/I meta SIR/SIRF program: C version %f\n",VERSION);
-preloaded = 0
-save_workspace = 0
+preloaded = 1
+save_workspace = 1
 res = 1;
-sm_space = 1
+sm_space = 0
 
 if (~exist('setup_in', 'var') | ~exist('outpath', 'var') | ~exist('storage_option', 'var'))
     fprintf("\nusage: %s setup_in outpath storage_option\n\n",setup_in);
@@ -400,12 +400,12 @@ if ~preloaded
     
     fclose(file_id);
     if save_workspace == 1
-        save('smap_work.mat','-v7.3');
+        save('smap_work_tbspace.mat','-v7.3');
 %         save('pointer.mat', pointer);
 %         save('aresp1.mat',aresp1);
     end
 else
-    load('/Users/low/Documents/MATLAB/SMAP/my_SMAP/smap_work.mat');
+    load('/Users/low/Documents/MATLAB/SMAP/my_SMAP/smap_work_tbspace.mat');
 %     load('/Users/low/Documents/MATLAB/SMAP/my_SMAP/pointer.mat');
 %     load('/Users/low/Documents/MATLAB/SMAP/my_SMAP/aresp1.mat');
 end
@@ -427,7 +427,7 @@ old_amax = a_init;
 a_temp = zeros(nsize,1);
 tot = zeros(nsize,1);
 
-nits = 400;
+nits = 15;
 old_nsx = size(a_val,1);
 old_nsy = size(a_val,2);
 [tbav2, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav]=data_loadSIR(year,day + 1,0,res);
@@ -441,6 +441,8 @@ read_start_day = day;
 read_end_day = read_start_day + 4; 
 if ~ismac
     a_val = ncread(strcat('/home/spencer/Documents/MATLAB/Research/SMAP/images/SMvb-E2T16-', int2str(read_start_day),'-',int2str(read_end_day),'.lis_dump.nc'),'ave_image');
+else 
+    a_val = ncread(strcat('/Users/low/CLionProjects/SMAP/sir/images/SMvb-E2T16-',int2str(read_start_day),'-',int2str(read_end_day),'.lis_dump.nc'),'ave_image');
 end
 a_val = reshape(a_val,[nsx,nsy]);
 % a_val = flipud(a_val');

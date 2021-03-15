@@ -1,7 +1,7 @@
 clear all;
 a_init = 230.0;
 meas_offset = 0;
-nits = 30;
+nits = 50;
 AVE_INIT = 1;
 NOISY = false;
 
@@ -100,9 +100,11 @@ b_val = fread(file_id, nsx * nsy, 'float');
 
 temp = reshape(b_val, [nsx, nsy]);
 figure(1)
-imagesc(temp)
+imagesc(exp(temp./300) + 5)
 colormap(gray)
 title("True Image")
+axis off
+colorbar
 
 nrec = 0;
 ncnt = 0;
@@ -281,6 +283,17 @@ old_amin = a_init;
 old_amax = a_init;
 a_temp = zeros(nsize,1);
 tot = zeros(nsize,1);
+
+sm = exp(pow ./ 300) + 5;
+
+for i=1:length(aresp1)
+    
+    data(i).sm_resp = (exp((aresp1(i).resp .* pow(i) ./ nanmean(aresp1(i).resp))./300) + 5) ./ sm(i);
+%     data(i).sm_resp = 1./data(i).sm_resp;
+%     data(i).sm_resp = data(i).sm_resp - nanmean(data(i).sm_resp);
+    data(i).pt = pointer(i).pt;
+end
+
 for its = 0:nits - 1
     a_temp = zeros(nsize,1);
     tot = zeros(nsize,1);
@@ -289,13 +302,19 @@ for its = 0:nits - 1
         pow = azang;
     end
     
-    pow = pow + meas_offset;
-    if its == 1
-        asdfasdf = 0;
-    end
+%     if its > 0
+%         a_val = log(a_val - 5) .* 300;
+%     end
+
     
-    [a_val, a_temp, tot, sx, sx2, total] = get_updates(pow', ang, count, pointer, aresp1, a_val, sx, sx2, a_temp, tot);
+    [a_val, a_temp, tot, sx, sx2, total] = get_simUpdates(pow', ang, count, pointer, aresp1, a_val, sx, sx2, a_temp, tot);
     a_val(a_temp > 0) = a_temp(a_temp>0);
+    
+    
+%     a_val = exp(a_val ./ 300) + 5;
+    
+
+    
     %     for i = 1:length(a_temp)
     %         hit = (a_temp(i).a_temp > 0);
     % %     total = total + tot .* hit;
@@ -318,20 +337,29 @@ temp2 = reshape(a_val, [nsx, nsy]);
 figure(2)
 imagesc(temp2)
 colormap(gray)
-title('MATLAB Code SIRF OUTPUT')
+title('Transformed Measurement Update SIRF')
+axis off
+colorbar
 
 
 [image, head, descrip, iaopt]=loadsir('simA.sir');
 
 figure(4)
-imagesc(flip(image',2))
+imagesc(exp(flip(image',2) ./ 300) + 5)
 colormap(gray)
-title('C Code SIRF OUTPUT')
+title('Sequential SIRF to Transformation')
+axis off
+colorbar
 
-diff = temp2 - flip(image',2);
+diff = temp2 - (exp(flip(image',2) ./ 300) + 5);
 figure(5)
 imagesc(diff)
 colorbar
+axis off
+title('Difference Between Both Methods')
+
+[com_mean_err, com_rmse] = compute_sm_err(temp2, exp(temp./300) + 5)
+[seq_mean_err, seq_rmse] = compute_sm_err((exp(flip(image',2) ./ 300) + 5), exp(temp./300) + 5)
 
 % for i = 1:nsy
 %     ancil(1:nsx, i) = i:nsx + i - 1;

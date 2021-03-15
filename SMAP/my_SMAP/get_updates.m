@@ -21,9 +21,9 @@ for i = 1:length(fill_array)
     response_array(i).resp = response_array(i).resp(find(mask));
     fill_array(i).pt = fill_array(i).pt(find(mask));
     
-    total(i) = nansum(response_array(i).resp .* a_val(fill_array(i).pt));
+    total(i) = nansum(abs(response_array(i).resp .* a_val(fill_array(i).pt)));
 %     mask = ~isnan(a_val(fill_array(i).pt));
-    num(i) = nansum(response_array(i).resp);
+    num(i) = nansum(abs(response_array(i).resp));
 
 end
 
@@ -31,7 +31,7 @@ ave = total ./ (num);
 update_idx = ones(size(ave,1), size(ave,2));
 update_idx(ave == 0) = 0;
 
-scale = power ./ ave; % Look at scale for the two pixels. Should be around 1. 
+scale = power ./ (ave); % Look at scale for the two pixels. Should be around 1. 
 % update = zeros(size(scale,1),size(scale,2));
 
 scale(scale > 0) = sqrt(scale(scale > 0));
@@ -47,11 +47,15 @@ for i=1:length(scale)
         update(i).upd =  0.5 * ave(i) * (1.0 - scale(i)) + (a_val(fill_array(i).pt)) * scale(i);
     end
     
-    update(i).upd(update(i).upd <= 0) = 0.001;
-    update(i).upd(update(i).upd > 0.6) = 0.06;
+%     update(i).upd(update(i).upd < -0.6) = -0.6;
+%     update(i).upd(update(i).upd > 0.6) = 0.6;
     
-    tot(fill_array(i).pt) = tot(fill_array(i).pt) + response_array(i).resp;
+    tot(fill_array(i).pt) = tot(fill_array(i).pt) + (response_array(i).resp);
     test = (a_temp(fill_array(i).pt) .* (tot(fill_array(i).pt) - response_array(i).resp) + update(i).upd .* response_array(i).resp) ./ tot(fill_array(i).pt);
+    
+    test(test > 0.6) = 0.6;
+    test(test < -0.6) = -0.6;
+    
     a_temp(fill_array(i).pt) = test;
     sx(fill_array(i).pt) = (sx(fill_array(i).pt) .* (tot(fill_array(i).pt) - response_array(i).resp) + response_array(i).resp .* ang(i)) ./ tot(fill_array(i).pt);
     sx2(fill_array(i).pt) = (sx2(fill_array(i).pt) .* (tot(fill_array(i).pt) - response_array(i).resp) + response_array(i).resp .* (ang(i).^2)) ./ tot(fill_array(i).pt);

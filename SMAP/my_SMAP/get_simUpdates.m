@@ -41,15 +41,15 @@ for i=1:length(scale)
     tot(fill_array(i).pt) = tot(fill_array(i).pt) + response_array(i).resp;
     test = (a_temp(fill_array(i).pt) .* (tot(fill_array(i).pt) - response_array(i).resp) + update(i).upd .* response_array(i).resp) ./ tot(fill_array(i).pt);
     a_temp(fill_array(i).pt) = test;
-    sx(fill_array(i).pt) = (sx(fill_array(i).pt) .* (tot(fill_array(i).pt) - response_array(i).resp) + response_array(i).resp .* ang(i)) ./ tot(fill_array(i).pt);
-    sx2(fill_array(i).pt) = (sx2(fill_array(i).pt) .* (tot(fill_array(i).pt) - response_array(i).resp) + response_array(i).resp .* (ang(i).^2)) ./ tot(fill_array(i).pt);
+    sx(fill_array(i).pt) = (sx(fill_array(i).pt) .* (tot(fill_array(i).pt) - response_array(i).resp) + response_array(i).resp .* ang) ./ tot(fill_array(i).pt);
+    sx2(fill_array(i).pt) = (sx2(fill_array(i).pt) .* (tot(fill_array(i).pt) - response_array(i).resp) + response_array(i).resp .* (ang.^2)) ./ tot(fill_array(i).pt);
     
     temp4 = a_val;
     temp4(a_temp > 0) = a_temp(a_temp > 0);
     temp3 = reshape(temp4, [316, 158]);
-    figure(3)
-    imagesc(temp3)
-    colormap(gray)
+%     figure(3)
+%     imagesc(temp3)
+%     colormap(gray)
 %     impixelinfo
     
     %
