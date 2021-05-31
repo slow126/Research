@@ -62,6 +62,8 @@ for i = 1:length(data)
         tb_footprint = 0.1 * (tb_footprint - nanmean(tb_footprint(:))) + nanmean(tb_footprint(:));
         
         tb_compress = data(i).tb_meas .* tb_footprint ./ nanmean(tb_footprint(:));
+        tb_compress(:) = data(i).tb_meas;
+        tb_compress = -1*(tb_compress - nanmean(tb_compress)) + nanmean(tb_compress);
 
         emis= tb_compress ./ data(i).tempav; %calculate the rough emissivity
         
@@ -113,9 +115,9 @@ for i = 1:length(data)
 %         emis = (emis - 1) ./ exp(h.*cos(data(i).inc).^2) + 1; % Add surface roughness effects
 %         emis = emis .* (cantrans.^2 + data(i).albav .* cantrans - data(i).albav.*cantrans.^2) + 1 - cantrans.^2 - data(i).albav + data(i).albav .* cantrans.^2; %Add vegetation effects
 %         sm_prf2 = emis .* data(i).tempav;
-
-        
-        data(i).sm_resp = (sm_prf - nanmean(sm_prf(:))); %100 * (sm_prf - nanmean(sm_prf(:))) + nanmean(sm_prf(:)); %((1 ./ (sm_prf + 0.00001)));
+        data(i).sm_resp = sm_prf - nanmean(sm_prf(:));
+%         data(i).sm_resp = (sm_prf - nanmin(sm_prf(:)))./(nanmax(sm_prf(:)) - nanmin(sm_prf(:)));
+%         data(i).sm_resp = (sm_prf - nanmean(sm_prf(:))); %100 * (sm_prf - nanmean(sm_prf(:))) + nanmean(sm_prf(:)); %((1 ./ (sm_prf + 0.00001)));
 %         data(i).sm_resp = data(i).sm_resp + nanmin(data(i).sm_resp(:));
         data(i).sm_meas = sm_meas(i);
             

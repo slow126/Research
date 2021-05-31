@@ -100,9 +100,9 @@ b_val = fread(file_id, nsx * nsy, 'float');
 
 temp = reshape(b_val, [nsx, nsy]);
 figure(1)
-imagesc(exp(temp./300) + 5)
-colormap(gray)
-title("True Image")
+% imagesc(exp(temp./300) + 5)
+imagesc(temp)
+% title("True Image")
 axis off
 colorbar
 
@@ -285,6 +285,7 @@ a_temp = zeros(nsize,1);
 tot = zeros(nsize,1);
 
 sm = exp(pow ./ 300) + 5;
+pow = sm;
 
 for i=1:length(aresp1)
     
@@ -302,16 +303,16 @@ for its = 0:nits - 1
         pow = azang;
     end
     
-%     if its > 0
-%         a_val = log(a_val - 5) .* 300;
-%     end
+    if its > 0
+        a_val = log(a_val - 5) .* 300;
+    end
 
     
     [a_val, a_temp, tot, sx, sx2, total] = get_simUpdates(pow', ang, count, pointer, aresp1, a_val, sx, sx2, a_temp, tot);
     a_val(a_temp > 0) = a_temp(a_temp>0);
     
     
-%     a_val = exp(a_val ./ 300) + 5;
+    a_val = exp(a_val ./ 300) + 5;
     
 
     
@@ -336,8 +337,7 @@ end
 temp2 = reshape(a_val, [nsx, nsy]);
 figure(2)
 imagesc(temp2)
-colormap(gray)
-title('Transformed Measurement Update SIRF')
+% title('Transformed Measurement Update SIRF')
 axis off
 colorbar
 
@@ -346,8 +346,7 @@ colorbar
 
 figure(4)
 imagesc(exp(flip(image',2) ./ 300) + 5)
-colormap(gray)
-title('Sequential SIRF to Transformation')
+% title('Sequential SIRF to Transformation')
 axis off
 colorbar
 
@@ -358,8 +357,11 @@ colorbar
 axis off
 title('Difference Between Both Methods')
 
-[com_mean_err, com_rmse] = compute_sm_err(temp2, exp(temp./300) + 5)
-[seq_mean_err, seq_rmse] = compute_sm_err((exp(flip(image',2) ./ 300) + 5), exp(temp./300) + 5)
+% [com_mean_err, com_rmse] = compute_sm_err(temp2, exp(temp./300) + 5)
+% [seq_mean_err, seq_rmse] = compute_sm_err((exp(flip(image',2) ./ 300) + 5), exp(temp./300) + 5)
+
+figure(4)
+imagesc(abs((temp2 - (exp(temp./300) + 5)) ./ (exp(temp./300) + 5)) * 100)
 
 % for i = 1:nsy
 %     ancil(1:nsx, i) = i:nsx + i - 1;
@@ -368,6 +370,10 @@ title('Difference Between Both Methods')
 % figure(6)
 % imagesc(temp2 + ancil)
 % colormap(gray)
+
+imagesc(abs(((exp(flip(image',2) ./ 300) + 5) - (exp(temp./300) + 5)) ./ (exp(temp./300) + 5)) * 100)
+axis off
+colorbar
 
 
 

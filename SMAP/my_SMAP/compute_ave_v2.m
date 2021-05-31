@@ -36,8 +36,8 @@ function [ave] = compute_ave_v2(pow, data, a_val,fig)
     ave = (total) ./ ((resp_total));
     
     figure(fig)
-%     temp = reshape(ave, [11568,4872]);
-    temp = reshape(ave, [316, 158]);
+    temp = reshape(ave, [11568,4872]);
+%     temp = reshape(ave, [316, 158]);
 %     temp(temp == 0) = NaN;
     temp = flipud(temp');
 %     imagesc(temp(900:1400,8150:8350))
@@ -53,8 +53,11 @@ function [ave] = compute_ave_v2(pow, data, a_val,fig)
 %     ave(ave < 0) = abs(ave(ave<0).^1.2);
 
 %     imagesc(abs(temp(3274:3580, 3715:4000)))
+%     temp(temp > 0) = temp(temp > 0) * 2;
+%     temp(temp < 0) = temp(temp < 0) * -1;
     
-    imagesc(temp)
+%     imagesc(abs(temp(3274:3580, 3715:4000)))
+    imagesc(abs(temp))
     drawnow
 
 end

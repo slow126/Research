@@ -53,8 +53,8 @@ for i=1:length(scale)
     tot(fill_array(i).pt) = tot(fill_array(i).pt) + (response_array(i).resp);
     test = (a_temp(fill_array(i).pt) .* (tot(fill_array(i).pt) - response_array(i).resp) + update(i).upd .* response_array(i).resp) ./ tot(fill_array(i).pt);
     
-    test(test > 0.6) = 0.6;
-    test(test < -0.6) = -0.6;
+%     test(test > 0.6) = 0.6;
+%     test(test < -0.6) = -0.6;
     
     a_temp(fill_array(i).pt) = test;
     sx(fill_array(i).pt) = (sx(fill_array(i).pt) .* (tot(fill_array(i).pt) - response_array(i).resp) + response_array(i).resp .* ang(i)) ./ tot(fill_array(i).pt);

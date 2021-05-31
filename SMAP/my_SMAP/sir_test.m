@@ -1,4 +1,4 @@
-function [a_val] = sir_test(setup_in, outpath, storage_option, year, day)
+function [a_val, min_error] = sir_test(setup_in, outpath, storage_option, year, day)
 VERSION = 1.3;
 CREATE_NON = 1;
 anodata_A=100.0;
@@ -10,11 +10,11 @@ anodata_V=-1.0;
 anodata_E=-15.0;
 
 fprintf("BYU SSM/I meta SIR/SIRF program: C version %f\n",VERSION);
-preloaded = 1
+preloaded = 0
 save_workspace = 0
 res = 1;
 sm_space = 1
-load_data = 1
+load_data = 0
 
 if (~exist('setup_in', 'var') | ~exist('outpath', 'var') | ~exist('storage_option', 'var'))
     fprintf("\nusage: %s setup_in outpath storage_option\n\n",setup_in);
@@ -401,7 +401,7 @@ if ~preloaded
     
     fclose(file_id);
     if save_workspace == 1
-        save('smap_work.mat','-v7.3');
+        save(strcat(int2str(day),'smap_work.mat'),'-v7.3');
 %         save('pointer.mat', pointer);
 %         save('aresp1.mat',aresp1);
     end
@@ -429,7 +429,7 @@ old_amax = a_init;
 a_temp = zeros(nsize,1);
 tot = zeros(nsize,1);
 
-nits = 200;
+nits = 15;
 old_nsx = size(a_val,1);
 old_nsy = size(a_val,2);
 [tbav2, albav, incav, qualav, clayf, vopav, rghav, smav, vwcav, tempav, wfracav]=data_loadSIR(year,day + 1,0,res);
@@ -489,8 +489,8 @@ if sm_space == 1
 %             data(i).sm_resp = data(i).sm_resp - nanmean(data(i).sm_resp);
 %         end
         
-        save(strcat('data-',int2str(day),'-zero_mean2.mat'),'data','-v7.3')
-        save(strcat('sm_meas-',int2str(day),'-zero_mean2.mat'),'sm_meas','-v7.3')
+        save(strcat('data-',int2str(day),'-zero_mean_test.mat'),'data','-v7.3')
+        save(strcat('sm_meas-',int2str(day),'-zero_mean_test.mat'),'sm_meas','-v7.3')
         
         
 %         tempav(tempav == 220) = NaN;
@@ -584,13 +584,62 @@ if sm_space == 1
 %         a_val(a_val > 0.6) = NaN;
 %         a_val = a_val + 0.6;
         figure(4)
-        title('AVE image')
+%         title('AVE image')
 %         junk2 = compute_ave(tbval(data_idx(1:1000)), pointer(data_idx(1:1000)), aresp1(data_idx(1:1000)), a_val,4);
 %         diff = junk - junk2;
 %         diff = reshape_img(diff,nsx,nsy);
 %         imagesc(diff)
 
 end
+
+% figure(1)
+% imagesc((wfracav(3274:3580, 3715:4000)))
+% drawnow
+% axis off
+% colorbar
+% 
+% figure(2)
+% imagesc((tbav2(3274:3580, 3715:4000)).*~isnan(rghav(3274:3580, 3715:4000)))
+% axis off
+% colorbar
+% saveas(figure(2),'chapter4/tbav.png')
+% 
+% figure(3)
+% imagesc((clayf(3274:3580, 3715:4000).*~isnan(rghav(3274:3580, 3715:4000))))
+% axis off
+% colorbar
+% saveas(figure(3),'chapter4/clayf.png')
+% 
+% figure(4)
+% imagesc((tempav(3274:3580, 3715:4000)))
+% axis off
+% colorbar
+% saveas(figure(4),'chapter4/tempav.png')
+% 
+% figure(5)
+% imagesc((albav(3274:3580, 3715:4000)))
+% axis off
+% colorbar
+% saveas(figure(5),'chapter4/albav.png')
+% 
+% figure(6)
+% imagesc((vopav(3274:3580, 3715:4000)))
+% axis off
+% colorbar
+% saveas(figure(6),'chapter4/vopav.png')
+% 
+% figure(7)
+% imagesc((incav))
+% axis off
+% colorbar
+% saveas(figure(7),'chapter4/incav.png')
+% 
+% figure(8)
+% imagesc((rghav(3274:3580, 3715:4000)))
+% drawnow
+% axis off
+% colorbar
+% saveas(figure(8),'chapter4/rghav.png')
 
 
 % tb_meas_img = zeros(size(a_val));
@@ -608,60 +657,90 @@ end
 % tb_meas_img = reshape_img(tb_meas_img, 11568, 4872);
 
 
-total2 = ones(11568,4872) * NaN;
-figure(11)
-total2(data(1).pt) = data(1).sm_resp;
-temp = reshape(total2, [11568,4872]);
-temp = flipud(temp');
-my_mesh = temp(320:327, 8473:8491);% / nanmax(temp(:));
-%             surf(abs(my_mesh))
-imagesc(my_mesh)
-%             imagesc(temp)
-% daspect([1 1 .025])
-yticks([1:7])
-yticklabels([-3:3] * 3)
-ylabel('Distance from center of SMRF in KM', 'FontSize',20)
-xlabel('Distance from center of SMRF in KM', 'FontSize',20)
-xticks([1:2:20])
-xticklabels([-9:2:11]*3)
-drawnow
+% % total2 = ones(11568,4872) * NaN;
+% % figure(11)
+% % total2(data(1).temp_pt) = data(1).temp_resp;
+% % temp = reshape(total2, [11568,4872]);
+% % temp = flipud(temp')./nanmax(temp(:));
+% % my_mesh = temp(315:327, 8464:8500);% / nanmax(temp(:));
+% % %             surf(abs(my_mesh))
+% % imagesc(my_mesh)
+% % %             imagesc(temp)
+% % % daspect([1 1 .025])
+% % yticks([1:13])
+% % yticklabels([-6:6] * 3)
+% % ylabel('Distance from center of SMRF in KM')
+% % xlabel('Distance from center of SMRF in KM')
+% % xticks([1:2:37])
+% % xticklabels([-18:2:18]*3)
+% % colorbar
+% % drawnow
+% % 
+% % figure(10)
+% % imagesc(tbav2)
+% % hold on
+% % rectangle('Position', [3715, 3274, 3580-3274, 4000-3715], 'EdgeColor','r', 'LineWidth', 3)
+% % hold off
+% % axis off
+% % colorbar
+% (3274:3580, 3715:4000)
+
 
 data2 = data;
-sm_start_itr = nits + 1;
 % a_val = a_val - nanmin(a_val(:));
 if sm_space == 1
     for i = length(data):-1:1
 %         data(i).sm_resp(data(i).sm_resp > 0) = 0;
 %         data(i).sm_resp = data(i).sm_resp * -1;
+%         data(i).sm_resp = data(i).sm_resp - nanmin(data(i).sm_resp(:));
 
 %         data(i).sm_resp(data(i).sm_resp < 0) = abs(data(i).sm_resp(data(i).sm_resp < 0).^.5 );
 %         data(i).sm_resp = data(i).sm_resp * -1;
 
 %         data(i).sm_resp(data(i).sm_resp < -0.1) = -1 * 1./data(i).sm_resp(data(i).sm_resp < -0.1);% * -10000;
 %         data(i).sm_resp(data(i).sm_resp > -0.1) = abs(data(i).sm_resp(data(i).sm_resp > -0.1));
-        data(i).sm_resp = 1./abs(data(i).sm_resp);
+%         data(i).sm_resp = 1./abs(data(i).sm_resp);
 
 %         data(i).sm_resp = abs(data(i).sm_resp);
 
+%         data(i).sm_resp = (data(i).sm_resp - nanmin(data(i).sm_resp))./(nanmax(data(i).sm_resp) - nanmin(data(i).sm_resp));
+% %         data(i).sm_resp = data(i).sm_resp - nanmean(data(i).sm_resp);
 %         data(i).sm_resp = exp(data(i).sm_resp);
 %         sm_resp(i).resp = (atan(data(i).sm_resp - nanmin(data(i).sm_resp)));
-%         data(i).pt = data(i).pt(data(i).sm_resp > 0);
-%         data(i).sm_resp = (data(i).sm_resp(data(i).sm_resp > 0));
+
+%         data(i).pt = data(i).pt(data(i).sm_resp < 0);
+%         data(i).sm_resp = abs(data(i).sm_resp(data(i).sm_resp < 0));
+
+%         data(i).sm_resp = abs(data(i).sm_resp - nanmin(data(i).sm_resp));
+%         data(i).sm_resp = abs(data(i).sm_resp);
+        
+
+% Inverse      
+%         data(i).sm_resp(data(i).sm_resp < 0) = 1./data(i).sm_resp(data(i).sm_resp < 0);
+
+% Negative Lobe
+%         data(i).sm_resp = (data(i).sm_resp - nanmax(data(i).sm_resp) - 0.01);
+%         data(i).pt = data(i).pt(data(i).sm_resp < 0);
+%         data(i).sm_resp = abs(data(i).sm_resp(data(i).sm_resp < 0));
         
         sm_pointer(i).pt = data(i).pt;
-        sm_resp(i).resp = abs(data(i).sm_resp);
+        sm_resp(i).resp = data(i).sm_resp;
                 
 
     end
 end
 
 a_val = compute_ave_v2(sm_meas, data, a_val,4);
+a_val = abs(a_val);
+a_val = a_val * 0 + 0.0001;
 
 poss_mois = 0.0001:.001:0.5;
 
 
 err = zeros(1,nits);
 
+nits = 50
+sm_start_itr = nits + 1;
 
 for its = 1:nits
     a_temp = zeros(nsize,1);
@@ -750,6 +829,8 @@ end
 % a_val = reshape(a_val', [old_nsx, old_nsy]);
 
 
+
+
 temp2 = reshape(a_val, [nsx, nsy]);
 figure(2)
 imagesc(fliplr(temp2)')
@@ -757,6 +838,7 @@ imagesc(fliplr(temp2)')
 title('MATLAB Code SIRF OUTPUT')
 save('a_val.mat','a_val')
 
+min_error = [min(mean_err), min(rms_err)];
 
 % [image, head, descrip, iaopt]=loadsir('simA.sir');
 %
