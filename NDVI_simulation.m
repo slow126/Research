@@ -12,8 +12,8 @@ corr = spatialCorr_basic(x,y);
 % addpath('/home/spencer/Documents/MATLAB/test_folder')
 % directory='/home/spencer/Documents/MATLAB/test_folder/*.nc';
 
-addpath('/Users/spencerlow/Documents/src/test_Folder/');
-directory = '/Users/spencerlow/Documents/src/test_Folder/*.nc';
+addpath('/Users/low/Documents/src/test_Folder/');
+directory = '/Users/low/Documents/src/test_Folder/*.nc';
 
 radiometer_freq = '37';
 hemi = 'T';
@@ -42,8 +42,8 @@ tb = nanmean(cat(3,prerad_h,prerad_v),3);
 sigma = nanmean(cat(3,sigma_h,sigma_v),3);
 
 
-%[ndvi, head, desrip, iaopt] = loadsir('/home/spencer/Documents/MATLAB/NDVI/AVHRR-Land_v004_AVH13C1_NOAA-14_19990227_c20140212105427.nc.E2T.sir');
-[ndvi, head, desrip, iaopt] = loadsir('AVHRR-Land_v004_AVH13C1_NOAA-14_19990227_c20140212105427.nc.E2T.sir');
+% [ndvi, head, desrip, iaopt] = loadsir('/home/spencer/Documents/MATLAB/NDVI/AVHRR-Land_v004_AVH13C1_NOAA-14_19990227_c20140212105427.nc.E2T.sir');
+[ndvi, head, desrip, iaopt] = loadsir('/Users/low/Documents/MATLAB/NDVI/AVHRR-Land_v004_AVH13C1_NOAA-14_19990227_c20140212105427.nc.E2T.sir');
 
 
 
