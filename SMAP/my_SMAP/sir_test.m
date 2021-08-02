@@ -14,7 +14,7 @@ preloaded = 0
 save_workspace = 0
 res = 1;
 sm_space = 1
-load_data = 0
+load_data = 1
 
 if (~exist('setup_in', 'var') | ~exist('outpath', 'var') | ~exist('storage_option', 'var'))
     fprintf("\nusage: %s setup_in outpath storage_option\n\n",setup_in);

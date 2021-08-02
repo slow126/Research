@@ -1,4 +1,10 @@
+for i=1:length(my_errors)
+    tot(i) = my_errors(i).err(1);
+    root(i) = my_errors(i).err(2);
+end
 
+mean(tot)
+mean(root)
 
 
 % load sm

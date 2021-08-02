@@ -57,7 +57,7 @@ function [ave] = compute_ave_v2(pow, data, a_val,fig)
 %     temp(temp < 0) = temp(temp < 0) * -1;
     
 %     imagesc(abs(temp(3274:3580, 3715:4000)))
-    imagesc(abs(temp))
+    imagesc((temp(1000:1400,8000:8400)))
     drawnow
 
 end
